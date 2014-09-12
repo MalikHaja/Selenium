@@ -1,0 +1,3675 @@
+// Validation.js - generic validation scripts for use in any data entry screens.
+
+// Javascript global variable declarations -----------------------------------------
+var g2DigitYearSplit = 79;		//<------ The year breakpoint is set here.... 1979....only for accepting 2 digit years.
+var gDateEntryFormat ;
+var gDateFormatMatched = "";
+var gErrString = "";
+var gIsAYAdmin = 1;
+
+var gImgErr0 = new Image();
+var gImgErr1 = new Image();
+		
+gImgErr0.src = "../../Common_Images/error0.gif";
+gImgErr1.src = "../../Common_Images/error1.gif";
+// ---------------------------------------------------------------------------------
+
+function validatePassword(strPassword, strConfirmPassword, minLength, maxLength)
+{
+	var blnError = false;
+	if (strPassword != "" && strConfirmPassword != "")
+	{
+		strPassword = strPassword;
+		strConfirmPassword = strConfirmPassword;
+		if (strPassword == "")
+		{
+			blnError = true;
+		}
+		if (strConfirmPassword == "")
+		{
+			blnError = true;
+		}
+		if (strPassword != strConfirmPassword)
+		{
+			addError("Your Password and Confirm Password do not match.", "Confirm Password","");
+		}
+		else
+		{
+			if (strPassword.length < minLength || strPassword.length > maxLength)
+			{
+				blnError = true;
+			}
+			if (strConfirmPassword.length < minLength || strConfirmPassword.length > maxLength)
+			{
+				blnError = true;
+			}
+			//- Upper case letters
+			if (!strPassword.match(/[A-Z]/))
+			{
+				blnError = true;
+			}
+			//- Lower case letters 
+			if (!strPassword.match(/[a-z]/)) 
+			{
+				blnError = true;
+			}
+			//- Digits 
+			if (!strPassword.match(/[0-9]/)) 
+			{
+				blnError = true;
+			}
+			//- Special characters (!, @, $, %, etc.) 
+			if (!strPassword.match(/[^ A-Za-z0-9]/))
+			{
+				blnError = true;
+			}
+			
+			if (strPassword.match(/[ ]/))
+			{
+				blnError = true;
+			}
+		}
+		if (blnError == true)
+		{
+			addError("The new password does not meet the requirements listed below. Enter a new password in both fields that meets all requirements.", "Password","");
+		}
+	}
+	else
+	{
+		addError("Password or Confirm Password cannot be empty", "Password","");
+	}
+}
+
+
+
+function validateStrongPassword(strvalue, strLabel)
+{
+	var blnfdno=false;
+	var blnfdchar=false;
+
+	for(var i=0;i<strvalue.length;i++)
+		{			
+			if (strvalue.charAt(i).search(/[0-9\s]/) == 0 )
+			{
+				blnfdno = true
+				break;
+			}	
+		}
+	for(var i=0;i<strvalue.length;i++)
+		{			
+			if (strvalue.charAt(i).search(/[a-zA-Z\s]/) == 0 )
+			{
+				blnfdchar = true
+				break;			
+			}	
+		}
+					
+	if ( (blnfdno) && (blnfdchar) )
+	{
+			//enforce length here
+		if (strvalue.length < 8 )
+		{
+		//AYI-2203-Update password validation message (Steve Johnson)
+			addError("Password should be at least 8 characters in length.", strLabel , "");
+			return false;
+		}
+	}
+	else
+		{
+			addError("Invalid password.  Passwords must contain at least one number and one letter", strLabel,"")
+			return false;
+		}
+		
+	if ( strvalue.search(/[^a-zA-Z0-9]/g) >= 0 )
+	{
+		addError("Invalid password:  Passwords must contain only the characters a-z or 0-9",strLabel,"")
+		return false;
+	}
+	return true;
+}
+
+function validateStrongPasswordConnect(strvalue, strLabel)
+{
+	var blnfdno=false;
+	var blnfdchar=false;
+	for(var i=0;i<strvalue.length;i++)
+		{			
+			if (strvalue.charAt(i).search(/[0-9\s]/) == 0 )
+			{
+				blnfdno = true
+				break;
+			}	
+		}
+	for(var i=0;i<strvalue.length;i++)
+		{			
+			if (strvalue.charAt(i).search(/[a-zA-Z\s]/) == 0 )
+			{
+				blnfdchar = true
+				break;			
+			}	
+		}
+					
+	if ( (blnfdno == false) || (blnfdchar == false) )
+		{
+			addError("Invalid password.  Passwords must contain at least one number and one letter", strLabel,"")
+			return false;
+		}
+		
+	if ( strvalue.search(/[^a-zA-Z0-9]/g) >= 0 )
+	{
+		addError("Invalid password:  Passwords must contain only the characters a-z or 0-9",strLabel,"")
+		return false;
+	}
+	return true;
+}
+
+
+function displayAppRecErrors(blnSessionLess, blnDecode)
+{
+	var Now = new Date();
+	var strUrl;
+	
+	var aErrors = gErrString.split("|");
+	var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+
+	if (aErrors.length >=2)
+	{
+		strErrHTML = "<table cellspacing='0' cellpadding='3' border='2' width='90%' align='center' bordercolor='black'><tr>" + 
+			"<td bgcolor='#ffffff' align='left' width='100%' class='BasePageFont'><br><font color='red'><b>System Message:</b></font>&nbsp;&nbsp;" +
+			"Please review the details presented below for more information. If required questions on this page are not complete, " + 
+			"they will be identified in the list below. All other page information will still be saved." +
+			"<div align='center'><img src='../images/common_images/dividing_line.gif' width='95%' height='5' alt=''><br><br>" +
+			"<table border=1 bordercolor='black' cellspacing='0' cellpadding='0' width='95%'><tr><td width=100%>" +
+			"<table border=0 cellspacing='5' cellpadding='0' width='100%'>"
+	}
+	
+	var sColor="";
+	for (i=0; i <= aErrors.length-1; i++)   
+	{
+		if (aErrors[i] != "")
+		{
+			arrElements = aErrors[i].split("^");
+												
+			lngPropertyCnt = arrElements.length -1;
+
+			if (lngPropertyCnt > 0)
+			{
+				strError = arrElements[lngPropertyCnt];
+				strErrNum = arrElements[lngPropertyCnt - 1];
+			}else
+			{
+				strError = arrElements[0];
+				strErrNum = "";
+			}
+			
+			if (strError != "")
+			{
+				strErrHTML = strErrHTML + "<tr " + sColor + "align='left' valign='top'>" + 
+					"<td class='BaseTableFont' width='30%'>"  + killChars(strErrNum, true) + "</td>" + 
+					"<td class='BaseTableFont' width='70%'>"  +  killChars(strError, true) + "</td>" + 
+					"</tr>";
+				
+				sColor = (sColor == "" ? "bgcolor='#CCCCCC' " : "");
+			}
+		}
+	}
+
+	if ((strErrHTML != "") && (aErrors.length >=2))
+	{
+		strErrHTML = strErrHTML + "<tr><td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='30%' height='10' alt=''></td>" +
+			"<td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='70%' height='10' alt=''></td></tr>" +
+			"</table></td></tr></table><br><br></div></td></tr></table><br>";
+		
+		divAyMsg.innerHTML = "<font color='#004731'>" + strErrHTML + "</font>";
+		divAyMsg.style.display = "block";
+		//ACE # 86
+		//window.location.href = "#top";
+	}
+
+	gErrString = "";
+}
+
+
+function displayErrors(blnSessionLess, blnDecode)
+{
+	var Now = new Date();
+	var strUrl;
+
+	if (blnSessionLess == true)
+	{
+		strUrl = "../common/error_sessionless.asp?errs=" + escape(gErrString);
+	}
+	else
+	{
+		strUrl = "../common/error.asp?"
+
+		var strTemp = location.href.toLowerCase();
+		var i = strTemp.indexOf("ayid=");
+		if (i > -1)
+		{
+			strUrl += "AYID=" + strTemp.substr(i+5, 34) + "&";
+		}
+		strUrl += "errs=" + escape(gErrString);
+	}
+
+	// Max length allowed by the window.open:Url parameter is 2120. Just to make
+	// sure things work, we make this limit 2000. So at this point we shouldn't
+	// have a string greater that 2120-length of date/time stamp, which is
+	// 2000-15=1985
+	if (strUrl.length > 1985)
+	{
+		// Truncate the string to 1985-(length of too many error string)=1985-65=1920
+		strUrl = strUrl.substr(0, 1920);
+		// Truncate the string till the last complete error (marked by a '|')
+		// changed %7C to %3E   : raj -- xx/xx/2008 (Raj's intention was to look for ^ which should be %5E but not %3E)
+		//changed %3E to %7C : Lalitha -- 01/13/2009 
+		//for AYI-136 -- 
+		//Error string was too long and errors are not displayed correctly
+		//%3E was not found (%3E is escape of >) so the url was just "../there are too many errors to display....." and hence the invalid page or page cannot be found
+		//changed the code back to %7C and the errors displayed correctly
+		strUrl = strUrl.substr(0, strUrl.lastIndexOf("%7C"));		
+		strUrl += escape("|^There are too many errors to display.  Please try again. |");		
+	}
+	
+	if (blnDecode == true)
+	{
+		strUrl += "&decode=1"
+	}
+	
+	strUrl += "&d=" + escape(Now.getTime());
+		
+	if (document.all)
+		gNewWin = window.open(strUrl, "Error", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=500, height=300,left=350");
+	else
+		gNewWin = window.open(strUrl, "Error", "toolbar=no,menubar=no,locationbar=no,scrollbars=yes,resizable=yes,status=no,screenX=500,screenY=300,width=500,height=300");
+
+	gErrString = "";
+}
+
+/* addError - Adds 1 error to the errorString that contains all detected errors before a submittal. */
+function addError(errMsg, strLabel, strPropName)
+{
+	if (typeof strLabel == 'undefined')
+	{
+		strLabel = '';
+	}
+	if (typeof strPropName == 'undefined')
+	{
+		strPropName = '';
+	}
+	if (gErrString == "")
+		gErrString = strPropName + '^' + strLabel + '^' + errMsg + '|';
+	else
+		gErrString += strPropName + '^' + strLabel + '^' + errMsg + '|';
+}
+
+
+/* trimString - takes a string and returns a string with all leading and trailing spaces removed. */
+function trimString(strString)
+{
+	strString = "" + strString;
+	return strString.replace(/^\s+|\s+$/g,"");
+}
+
+function trim(strText) { 
+    // this will get rid of leading spaces 
+    while (strText.substring(0,1) == ' ') 
+        strText = strText.substring(1, strText.length);
+
+    // this will get rid of trailing spaces 
+    while (strText.substring(strText.length-1,strText.length) == ' ')
+        strText = strText.substring(0, strText.length-1);
+
+   return strText;
+} 
+
+/* getElement - this function returns a form element object given that elements ID
+Example- getElement(43); returns the element named "q43_??".      */
+function getElement(strID)
+{
+	strID = strID.toString();
+	var objForm = document.frmMain, objElement;
+	
+	// If it's a Safari browser, use different code to find the UI element
+	if (navigator.userAgent.toLowerCase().indexOf("safari") > -1)
+	{
+		objElement = objForm.elements["q" + strID];
+		if (objElement != undefined)
+		{
+			var objCtrl = eval('objElement.length');
+			if ((objCtrl != "") && (typeof(objCtrl) != "undefined") && (objCtrl != "0"))
+			{
+				for (objCtrl in objElement)
+				{
+					if ((objCtrl.name) && (objCtrl.name.indexOf("_") > -1))
+					{
+						return objCtrl;
+					}
+				}
+			}
+			else if (objElement.name.indexOf("_") > -1)
+			{
+				return getElementObject(objElement, objForm);
+			}
+		}
+	}
+
+	// Safari: if the element is not found above, try to find it from all the Form elements
+	//Loop through all of our form elements
+	for (var x=0;x<objForm.elements.length;x++)
+	{
+		objElement = objForm.elements[x];		
+		//AYI-671 For Firefox browsers , could not identify the Fieldset tags.
+		if (objElement.name)
+		{
+		    if ((objElement.name.substr(0, (strID.length + 2))) == ("q" + strID + "_"))
+		    {
+                return getElementObject(objElement, objForm);
+		    }
+		}
+	}
+
+	return null;
+}
+
+function getElementObject(objElement, objForm)
+{
+	if ((objElement.type)&&((objElement.type == "radio") || (objElement.type == "checkbox")))
+	{
+		return objForm.elements[objElement.name];
+	}
+	else
+	{
+		return objElement;
+	}
+}
+
+//==========================================================================
+/* validate* functions - these functions validate any given data (userEntry) for
+                         specific requirements. If errors are found, addError is
+						 called to record the error for display after all 
+						 validation has been completed.   All functions return true
+						 if validation was passed and false if validation was failed.   */
+//==========================================================================
+
+//====================================================== REQUIRED FIELD VALIDATION
+// User Entry must contain a value - it's required
+function validateRequired(strUserEntry, strLabel, strPropertyName)
+{	
+	if (gIsAYAdmin == 1)	// if we have an AYAdmin doing this application, skip all required validations.
+	{
+		strUserEntry = trimString(strUserEntry);
+		if (strUserEntry == "")
+		{
+		    addError(gErrFieldRequiredMsg, strLabel, strPropertyName);		
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//========================================================== NUMERIC VALIDATION
+// User Entry must be numeric
+function validateIsInteger(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/[^0-9]/g) > -1)
+	{
+		addError(gErrRequiredNumberMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+function validateIsNumeric(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/[^0-9.]/g) > -1)
+	{
+		addError(gErrRequiredNumberMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+function validateIsNumericGreaterThanZero(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry <= 0)
+	{
+		addError(gErrRequiredNumberGreaterThanZeroMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+//========================================================== NUMERIC VALIDATION
+// User Entry must be numeric
+function validateIsFloat(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	if (strUserEntry.search(/[^0-9.]/g) > -1)
+	{
+		addError(gErrRequiredNumberMsg, strLabel, strPropertyName);
+		return false;		
+	}
+	return true;
+}
+
+//========================================================== DIVISIBILITY(INCREMENTS) VALIDATION
+// User Entry must be divisible by a particular value to enforce defined increments
+function validateIsDivisible(strUserEntry, strDivisible,strLabel, strPropertyName) {
+    strUserEntry = trimString(strUserEntry);
+
+    if (strUserEntry == "")
+        return true;
+    if (strUserEntry % strDivisible == 0) 
+    {
+        return true;
+    }
+    else 
+    {
+        addError(gErrIncrementRequiredMsg, strLabel, strPropertyName);
+        return false;	     
+    }
+}
+
+//========================================================== NUMERIC RANGE VALIDATION
+// User Entry must be within a range
+function validateRange(strUserEntry, intLowerLimit, intUpperLimit, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	
+	if ((strUserEntry < intLowerLimit) || (strUserEntry > intUpperLimit))
+	{
+		addError(gErrRangeReqValueMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//========================================================== NUMERIC RANGE VALIDATION
+// User Entry must be within a range
+//Added By: NNaim Date: 07/11/2008 Purpose:  validate field length; either greater than minimum length or less than maximum length.
+function validateRequiredStringLength(strUserEntry, intMinLength, intMaxLength, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	
+	if ((strUserEntry.length < intMinLength) || (strUserEntry.length > intMaxLength))
+	{
+		addError(gErrRequiredMinMaxLengthMsg.replace(/MINLENGTH/g, intMinLength).replace(/MAXLENGTH/g, intMaxLength), strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//Added on 2nd May, 2001 --- Lalitha
+//========================================================== REQUIRED LENGTH
+// User Entry must be of required length
+function validateRequiredLength(strUserEntry, intMinLength, intMaxLength, strLabel, strPropertyName)
+{
+
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	if ((strUserEntry.length < intMinLength) || (strUserEntry.length > intMaxLength))
+	{
+	     addError(gErrRequiredMinMaxLengthMsg.replace(/MINLENGTH/g, intMinLength).replace(/MAXLENGTH/g, intMaxLength), strLabel, strPropertyName);	     
+	     return false; 	   		
+	}
+	return true;
+}
+
+// User Entry must be of required length
+function validateMinMaxLength(strUserEntry, intMinLength, intMaxLength, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+	if ((strUserEntry.length < intMinLength) || (strUserEntry.length > intMaxLength))
+	{
+	         addError(gErrMinMaxLengthMsg.replace(/MINLENGTH/g, intMinLength).replace(/MAXLENGTH/g, intMaxLength), strLabel, strPropertyName);	     
+	     
+	     return false; 	   		
+	}
+	return true;
+}
+
+//Added on 14th July, 2011 --- Gayathri
+//========================================================== Max Length Limitation
+// //AYI-1088 Enter description more than 255 characters in email filters screen set the description to empty	
+function validateRequiredMaxLength(strUserEntry, intMaxLength, strLabel, strPropertyName) {
+
+    strUserEntry = trimString(strUserEntry);
+
+    if (strUserEntry == "")
+        return true;  
+    if ((strUserEntry.length > intMaxLength)) {
+
+        addError(gErrRequiredMaxLengthMsg.replace(/MAXLENGTH/g, intMaxLength), strLabel, strPropertyName);
+
+        return false;
+    }
+    return true;
+}
+
+
+//================================================================ NUMBER BOUNDARIES
+// Validates that the number entered is within specified boundaries.... 
+// If LBound or UBound are blank, they are not validated.
+function validateNumberBounds(userEntry, LBound, UBound, strLabel, strPropertyName, blnTextGPA)
+{
+	userEntry = trimString(userEntry);
+	
+	if (userEntry == "")
+		return 0;
+
+	var charLBound = "" + LBound;
+	var charUBound = "" + UBound;
+	
+	
+
+	if ((charLBound.search(/-?\D/g) > -1) || (charUBound.search(/-?\D/g) > -1))
+	{
+		addError (gErrInvalidBoundsMsg, strLabel, strPropertyName)
+		return 1;
+	}
+	
+	if (!blnTextGPA)
+	{
+		if (userEntry.search(/-?\D/g) > -1)
+		{
+			addError(gErrRequiredNumberMsg, strLabel, strPropertyName);
+			return 1;
+		}
+	}
+	if ((userEntry < LBound) && (LBound != ""))
+	{
+		addError(gErrBelowReqValueMsg, strLabel, strPropertyName);
+		return 1;
+	}
+	else if ((userEntry > UBound) && (UBound != ""))
+	{
+		addError(gErrAboveReqValueMsg, strLabel, strPropertyName);
+		return 1;
+	}
+	else
+		return 0;
+ 
+}
+
+
+//========================================================== CHARACTER VALIDATION
+// Function only allows upper or lowercase alpha characters. 
+function validateIsAlpha(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/[^a-zA-Z]/g) > -1)
+	{
+		addError(gErrRequiredAlphaMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+function validateIsAlphaNumericUnderScore(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+	{
+		return true;
+	}
+	
+	if (strUserEntry.search(/[^_a-zA-Z0-9]/g) > -1)
+	{
+		addError(gErrRequiredAlphaNumericUnderScoreMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//=================================================== ALL ALPHANUMERIC VALIDATION
+//	Function allows all lowercase, uppercase,
+//	numeric values, underscore, apostrophe  and dot. 
+function validateIsAlphaNumericWithSomeSpecials(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+	{
+		return true;
+	}
+	
+	if (strUserEntry.search(/[^_'.a-zA-Z0-9]/g) > -1)
+	{
+		addError(gErrRequiredAlphaNumericSomeSpecialMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//=================================================== ALL ALPHANUMERIC VALIDATION
+//	Function allows all lowercase, uppercase and
+//	numeric values. No special characters. No spaces
+function validateIsAlphaNumeric(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+	{
+		return true;
+	}
+
+	if (strUserEntry.search(/[^_a-zA-Z0-9]/g) > -1)
+	{
+		addError(gErrRequiredAlphaNumericMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//=================================================== ALL ALPHANUMERIC VALIDATION
+//	Function allows all lowercase, uppercase alphabets, 
+//	numeric values and spaces.
+function validateIsAlphaNumericSpace(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+	{
+		return true;
+	}
+	
+	if (strUserEntry.search(/[^a-zA-Z0-9\s]/g) > -1)
+	{
+		addError(gErrRequiredAlphaNumericSpaceMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//====================================================== ALL LOWERCASE VALIDATION
+// Function only allows lowercase alpha characters
+function validateIsAlphaLower(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	
+	if (strUserEntry.search(/[^\a-z\0-9\s]/) > -1)
+	{
+		addError(gErrRequiredAlphaLowerMsg, strLabel, strPropertyName);
+		return false;
+	}
+}
+
+//====================================================== ALL MIXEDCASE VALIDATION
+// Function allows mixedcase alpha characters
+function validateIsAlphaMixed(strUserEntry, strLabel, strPropertyName)
+{
+
+	var blnret = true;
+	strUserEntry = trimString(strUserEntry);
+	if (strUserEntry == "")
+		return true;
+	var result = "";
+    var words = strUserEntry.split(" ");
+    var count = words.length;
+	if (count > 2)
+		count = 2;
+	var blnupper;
+	blnupper = false;
+    for(var i=0;i<count;i++)
+    {
+		    
+		var temp = words[i];
+				
+		if (temp.search(/[A-Z\s]/) == 0)
+			{
+				blnupper = true
+				break;
+			}
+
+		if (temp.search(/[A-Z\0-9\s]/) < 0)
+		{
+			addError(gErrRequiredAlphaMixedMsg, strLabel, strPropertyName);
+			blnret = false;
+			return false;			
+		}
+		if  ( count==1 && blnret==true )
+		{
+			addError(gErrRequiredAlphaMixedMsg, strLabel, strPropertyName);			
+			return false;
+		}
+    }   
+    
+    var foundlow;
+    foundlow = false;
+    if (blnupper)
+    {
+		for(var i=0;i<strUserEntry.length;i++)
+		{			
+			if (strUserEntry.charAt(i).search(/[0-9\s]/) < 0 )
+			{
+				if ( strUserEntry.charAt(i).search(/[A-Z\s]/) < 0 )
+				{
+					foundlow = true;
+					break;
+				}
+			}			
+		}
+		if ( !(foundlow) ) 
+		{
+			addError(gErrRequiredAlphaMixedMsg, strLabel, strPropertyName);			
+			return false;
+		}
+    
+    }
+}
+
+//====================================================== ALL UPPERCASE VALIDATION
+// Function only allows uppercase alpha characters
+function validateIsAlphaUpper(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	
+	if ( strUserEntry.search(/[^\A-Z\0-9\s]/) > -1 )
+	{
+		addError(gErrRequiredAlphaUpperMsg, strLabel, strPropertyName);
+		return false;	
+	}
+}
+
+function checkTALength(strTextArea)
+	{
+		var strText = String(strTextArea.value);
+		
+		if (strText.length >= 255)
+		{	
+			strTextArea.value = strText.slice(0, 254);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+//========================================================== EMAIL VALIDATION
+// function checks for proper email formatting including '@', then '.', and at 2 to 6 char after that. also check if it is [ipaddress]
+//Added by pandi on 12/13/2001
+//Modified by Raj on 7/23/2010 AYI-902
+function ValidateemailCheck (emailStr , strLabel, strPropertyName) {
+
+   if (emailStr == "") // if blank return true ? we should check it before calling this method but for consistancy we added it here
+	{
+		return true;
+	}
+	
+    var pattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
+    if (emailStr.match(pattern)==null) {
+		addError(gErrInvalidEmailMsg, strLabel, strPropertyName);
+	    return false;
+	}
+	return true;
+}
+
+function ValidateMultipleEmailAddresses(emailStr, strLabel, strPropertyName, blnHobsonsIds)
+{
+	var strEmails = emailStr.replace(", ", ",").split(",");
+	var strTempEmail = "";
+	
+	for (var i=0;i < strEmails.length; ++i)
+	{
+		if (blnHobsonsIds)
+		{
+		    strTempEmail = strEmails[i].toLowerCase();
+		    if (strTempEmail.indexOf("@hobsons.com") == -1) 
+		    {
+		        addError(gErrInvalidEmailMsg, strLabel, strPropertyName);
+		        return false; 
+		    }
+		}
+		ValidateemailCheck(strEmails[i], strLabel, strPropertyName);
+	}
+}
+
+function ValidateMMEmailAddresses(strEmails, strLabel)
+{
+	if (strEmails != "")
+	{
+		var strEmails = strEmails.toLowerCase().replace(", ", ",").split(",");
+		
+		for (var i=0; i < strEmails.length; ++i)
+		{
+			ValidateMMOrNormalEmail(strEmails[i], strLabel);
+		}
+	}
+}
+
+function ValidateMMOrNormalEmail(strEmail, strLabel)
+{
+	var i = strEmail.indexOf("<ay:tag"), j;
+	
+	if (i > -1)
+	{
+		j = strEmail.indexOf(">", i+7);
+		
+		if (j < 0)
+		{
+			addError("Mail Merge Tag not closed properly.", strLabel);
+			return;
+		}
+		else if (j < strEmail.length-1)
+		{
+			addError("Invalid Mail Merge Tag.", strLabel);
+			return;
+		}
+	}
+	else
+	{
+		ValidateemailCheck(strEmail, strLabel, strLabel);
+	}
+}
+
+
+//========================================================== PHONE NUMBER VALIDATION
+// Phone number format should be either '(nnn)nnn-nnnn' or '(nnn) nnn-nnnn' or
+// 'nnn-nnn-nnnn' or 'nnn.nnn.nnnn' or 'nnnnnnnnnn'.
+function validateIsPhone(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/^(\d{10})$/g) > -1)
+	{
+		if (checkNumbersInPhone((RegExp.$1 + RegExp.$3 + RegExp.$5), strLabel, strPropertyName) == false)
+			return false;
+		return true;
+	}
+	else if (strUserEntry.search(/^\((\d{3})\) ?(\d{3})-(\d{4})$/g) > -1)
+	{
+		if (checkNumbersInPhone((RegExp.$1 + RegExp.$2 + RegExp.$3), strLabel, strPropertyName) == false)
+			return false;
+		return true;
+	}
+	else if (strUserEntry.search(/^(\d{3})(-|\.)(\d{3})(-|\.)(\d{4})$/g) > -1)
+	{
+		if (checkNumbersInPhone((RegExp.$1 + RegExp.$3 + RegExp.$5), strLabel, strPropertyName) == false)
+			return false;
+		return true;
+	}
+	else
+	{
+		addError(gErrInvalidPhoneFormatMsg, strLabel, strPropertyName);
+		return false;
+	}
+}
+
+// validate particular combinations that are unacceptable...
+// Phone number may not be '9999999999', '1111111111', or begin with a '0'. 
+function checkNumbersInPhone(strUserEntry, strLabel, strPropertyName)
+{
+	if ((strUserEntry.search(/^(1{10}|9{10})$/g) > -1) || (strUserEntry.search(/^(0)/) > -1))
+	{
+		addError(gErrInvalidPhoneValueMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+
+//============================================================== ZIP CODE VALIDATION
+// Zip Code format should be either 'nnnnn' or blank.
+function validateIsZip(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	if (strUserEntry.search(/^(\d{5})$/g) >= 0)
+	{
+		return true;
+	}
+	else if (strUserEntry.search(/^(\d{5}\-\d{4})$/g)  >= 0)
+	{
+		return true;
+	}
+	else
+	{
+		addError(gErrInvalidZipFormatMsg, strLabel, strPropertyName);
+		return false;
+	}
+	
+}
+
+
+//============================================================= PLUS FOUR VALIDATION
+// Plus Four format should be either 'nnnn' or blank.
+function validateIsPlusFour(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/^(\d{4})$/g) < 0)
+	{
+		addError(gErrInvalidPlusFourFormatMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+
+//======================================================= ZIP CODE PLUS FOUR VALIDATION
+// Zip Code format should be either 'nnnnn' or 'nnnnn-nnnn' or blank.
+function validateIsFullZip(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/^(\d{5})(-\d{4})?$/g) < 0)
+	{
+		addError(gErrInvalidFullZipFormatMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+
+
+//======================================================= CURRENCY FORMAT VALIDATION
+// currency should be in the format "nnnnn.nn", "nn,nnn.nn", "nn.n", and "nn.".
+// - basically with or without properly spaced comments, and with any number of
+// decimal places, also with or without the decimal point.
+function validateIsCurrency(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	var rxPattern1 = /^(\d{0,3})?(,\d{3})*(\.\d{0,2})?$/;
+	var arrPatternMatch1 = strUserEntry.match(rxPattern1, "g");
+
+	var rxPattern2 = /^\d*(\.\d{0,2})?$/;
+	var arrPatternMatch2 = strUserEntry.match(rxPattern2, "g");
+
+	if ((arrPatternMatch1 == null) && (arrPatternMatch2 == null))
+	{
+		addError(gErrInvalidCurrencyFormatMsg, strLabel, strPropertyName);
+		return false;
+	}
+	strUserEntry = strUserEntry + "";
+	return true;
+}
+
+
+function validateMonthYear(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+	
+
+	if (strUserEntry == "")
+		return true;
+		
+	if (strUserEntry.indexOf("/") == 2)
+	{
+		var month;
+		month = strUserEntry.substr(0, 2);
+		if (month > 12)
+		{
+			addError(gErrInValidMonthMsg, strLabel, strPropertyName);
+			return false;
+		}			
+	}
+		
+
+	if (strUserEntry.search(/^(\d{1,2})(\/)(\d{4})$/g) < 0)
+	{
+		if (strUserEntry.search(/^(\d{1,2})(-)(\d{4})$/g) < 0)
+		{
+			addError(gErrInvalidMonthYearFormat, strLabel, strPropertyName);
+			return false;
+		}
+	}
+}
+//================================================ DATE FORMAT AND VALUE VALIDATION
+function validateDate(strPropertyName, userEntry, strLabel)
+{
+
+    //i-Class UK Change
+if (isLocaleUK())
+    {
+   gDateEntryFormat = new Array("DD-MM-YYYY", "DD/MM/YYYY");
+   }           
+else { 
+ gDateEntryFormat = new Array("MM-DD-YYYY", "MM/DD/YYYY");
+     }
+
+	userEntry = trimString(userEntry);
+
+	if (userEntry == "")
+		return true;
+	
+	var strMatchedPattern = "";
+	var err = 0;
+
+	// remove any spaces that may be in any of the date-format strings.
+	for (var cnt=0;cnt<gDateEntryFormat.length;cnt++)
+	{
+		gDateEntryFormat[cnt] = trimString(gDateEntryFormat[cnt])
+	}
+
+	// make sure that a date is both valid and in the correct format
+	for (var k=0;k<gDateEntryFormat.length;k++)
+	{
+		// set the appropriate search pattern given the date-format required.
+		if (gDateEntryFormat[k] == "MM-DD-YY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{2})$/;
+		else if (gDateEntryFormat[k] == "MM/DD/YY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{2})$/;
+		else if (gDateEntryFormat[k] == "MM-DD-YYYY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "MM/DD/YYYY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "DD-MM-YYYY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "DD/MM/YYYY")
+		    var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{4})$/;	
+			
+		// attempt to match a search pattern.  This is a comprehensive format check.
+		var arrPatternMatch = userEntry.match(rxPattern, "g");
+		if (arrPatternMatch != null)
+		{
+			strMatchedPattern = gDateEntryFormat[k];
+		}
+		// Set the global variable gDateFormatMatched so that other functions will know what format was matched.
+		gDateFormatMatched = strMatchedPattern;
+	}
+	
+	if (strMatchedPattern != "")	// if a format was matched, check for the validity of the dates entered
+	{
+		var vMon , vDay , vYear
+		
+	if (isLocaleUK())
+    {
+        vDay = RegExp.$1;
+        vMon = RegExp.$3;
+		vYear = RegExp.$5;
+		
+    }           
+    else { 
+        vMon = RegExp.$1;
+		vDay = RegExp.$3;
+		vYear = RegExp.$5;
+		
+     }
+     
+		if (vMon<1 || vMon>12) err = 2;
+		if (vDay<1 || vDay>31) err = 2;
+		if (vYear.length == 2)
+		{
+			if (vYear>g2DigitYearSplit)
+				vYear = 1900 + parseFloat(vYear);
+			else
+				vYear = 2000 + parseFloat(vYear);
+		}
+		else
+		{
+			if (vYear<1900 || vYear>9999) err = 2;
+		}
+		
+		if (vMon==4 || vMon==6 || vMon==9 || vMon==11)
+		{
+			if (vDay==31) err=2;
+		}
+		if (vMon==2)
+		{
+			var g=parseInt(vYear/4);
+			if (isNaN(g))
+			{
+				err=2;
+			}
+			if (vDay>29) err=2;
+			if (vDay == 29)  // NOTE - this is NOT Y4K compliant!!!
+			{
+				if ((vYear % 4) == 0)
+				{
+					if ((vYear % 100) == 0)
+					{
+						if ((vYear % 400) != 0)
+						{
+							err = 2;
+						}
+					}
+				}
+				else
+				{
+					err = 2;
+				}
+			}
+		}
+	}
+	else
+	{
+		err = 1;
+	}
+
+	if (err==1)			// Formatting errors return a 1...
+	{
+	    //i-Class UK Change
+	        if (isLocaleUK())
+                { addError(gErrInvalidDateEuroFormat, strLabel, strPropertyName);
+                }           
+           else { addError(gErrInvalidDateFormat, strLabel, strPropertyName);
+                }
+	    
+		return false;
+	}
+	else if (err==2)	// Invalid Entries return a 2...
+	{
+	
+		addError(gErrInvalidDateEntry, strLabel, strPropertyName);
+		return false;
+	}
+	else				// 0 indicates a good date...
+	{
+		return true;
+	}
+}
+
+
+
+//================================================================== DATE BOUNDARIES
+// notes - this function invokes validateDate automatically on userEntry.  Valid 
+// LBound and UBound parameters must be in the format "MM/DD/YYYY" or "today" or
+// "none".  LBAdd and UBAdd can take integers(+ or -) of DAYS to add or subtract
+// to or from each bound.
+// If you don't want to add an LBAdd or UBAdd, please set to 0. 
+function validateDateBounds(userEntry, LBound, LBAdd, UBound, UBAdd, strLabel, strProperty)
+{
+	var blnGoodToGo = 1;
+	var tempYear;
+	var tempMon;
+	var tempDay;
+
+	userEntry = trimString(userEntry);
+
+	if (userEntry == "")
+		return true;
+
+	var dateLBound = new Date();  // default both of these to the current date.
+	var dateUBound = new Date();
+	var dateCurrent = new Date();
+	var dateMLHUserEntry = new Date();
+
+	dateLBound.setHours(0);
+	dateLBound.setMinutes(0);
+	dateLBound.setSeconds(0);
+	dateLBound.setMilliseconds(0);
+	dateUBound.setHours(0);
+	dateUBound.setMinutes(0);
+	dateUBound.setSeconds(0);
+	dateUBound.setMilliseconds(0);
+	dateCurrent.setHours(0);
+	dateCurrent.setMinutes(0);
+	dateCurrent.setSeconds(0);
+	dateCurrent.setMilliseconds(0);
+
+	// set dateLBound to the entered parameter...
+	if ((LBound != "today") && (LBound != "none"))
+	{
+		if (validateDate("LBound", LBound) == true)
+		{
+			// BE CAREFUL WITH PARSEINT!!!!!!  If a number is passed as a string beginning with a "0", as
+			// in "03" for March, ParseInt assumes it is base 8, not 10!!!!!  SPECIFY RADIX TO AVOID BURN!!!!
+			dateLBound.setYear(parseInt(LBound.substr(6,4), 10));
+			dateLBound.setMonth(parseInt(LBound.substr(0,2), 10) - 1);
+			dateLBound.setDate(parseInt(LBound.substr(3,2), 10));
+		}
+		else{
+			blnGoodToGo = 0;
+		}
+	}
+
+	// set dateUBound to the entered parameter...
+	if ((UBound != "today") && (UBound != "none"))
+	{
+		if (validateDate("UBound", UBound) == true)
+		{
+			dateUBound.setYear(parseInt(UBound.substr(6,4), 10));
+			dateUBound.setMonth(parseInt(UBound.substr(0,2), 10) - 1);
+			dateUBound.setDate(parseInt(UBound.substr(3,2), 10));
+		}
+		else
+			blnGoodToGo = 0;
+	}
+
+
+	if ((validateDate(strLabel, userEntry) == true) && blnGoodToGo)		// run validateDate on userEntry...
+	{
+		// add days as indicated by LBAdd and UBAdd parameters.
+		var dayMultiplier = (1000 * 60 * 60 * 24);
+		if (LBound != "none")
+			dateLBound.setTime(dateLBound.getTime() + (LBAdd * dayMultiplier));
+		if (UBound != "none")
+			dateUBound.setTime(dateUBound.getTime() + (UBAdd * dayMultiplier));
+
+		// set the appropriate search pattern given the date-format required.
+		if (gDateFormatMatched == "MM-DD-YY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{2})$/;
+		else if (gDateFormatMatched == "MM/DD/YY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{2})$/;
+		else if (gDateFormatMatched == "MM-DD-YYYY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{4})$/;
+		else if (gDateFormatMatched == "MM/DD/YYYY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{4})$/;
+		
+		var arrPatternMatch = userEntry.match(rxPattern, "g");
+		var dateUserEntry = new Date();
+
+		// construct full year if a 2-digit year is being used.
+		if ((gDateFormatMatched == "MM-DD-YY") || (gDateFormatMatched == "MM/DD/YY"))
+		{
+			if (RegExp.$5 > g2DigitYearSplit)
+				var userYearEntry = "19" + RegExp.$5;
+			else
+				var userYearEntry = "20" + RegExp.$5;
+		}
+		else
+			var userYearEntry = RegExp.$5
+
+
+		// fill dateUserEntry with values from userEntry.
+		dateUserEntry.setYear(userYearEntry);
+		dateUserEntry.setMonth(RegExp.$1 - 1);
+		dateUserEntry.setDate(RegExp.$3);
+
+		// *** at this point, dateLBound, dateUBound, and dateUserEntry
+		//     are all in proper date format and ready for calculations.
+
+		// --- very useful debug lines, do not remove
+		//var debugStr = "LBDiff = " + (LBDiff / dayMultiplier) + " and LBound is ";
+		//	debugStr = debugStr + (dateLBound.getMonth() + 1) + "-";
+		//	debugStr = debugStr + dateLBound.getDate() + "-" + dateLBound.getYear();
+		//alert(debugStr);
+		//alert("UBDiff = " + (UBDiff / dayMultiplier));
+
+		// get differences and create errors.
+
+		if (LBound != "none")
+		{
+
+			var LBDiff1 = dateUserEntry - dateCurrent;
+			var LBDiff2 = dateUserEntry - dateLBound;
+
+			if (LBDiff2 < 1)
+			{
+				addError(gErrBelowDateRange, strLabel, strProperty);
+				return false;
+			}
+		}
+
+		if (UBound != "none")
+		{
+			var UBDiff = dateUBound - dateUserEntry;
+			if (UBDiff < 1)
+			{
+				addError(gErrAboveDateRange, strLabel, strProperty);
+				return false;
+			}
+		}
+		return true;
+	}
+	else
+		return false;
+}
+
+
+
+
+
+//Added By Pandi On March 24 , 01
+function isMatch(strone , strtwo, strLabel, strPropertyName)
+{
+	if (strone != strtwo) 	
+	{
+		addError(gErrPasswordMatch, strLabel, strPropertyName );
+		return false;
+	}
+	return true;
+}
+
+//Added By Ronan on March 27 ,01
+//====================================================== REQUIRED RADIO BUTTON VALIDATION
+// Radio Button must be selected
+function validateRadioButtonRequired(objRadioButton, strLabel, strPropertyName)
+{
+	var bsuccess = false;
+
+    if (typeof(objRadioButton.length) == "undefined")
+    {
+        bsuccess = objRadioButton.checked;
+    }
+    else
+    {
+    	for (i=0;i<objRadioButton.length;i++)
+		{
+			if(objRadioButton[i].checked)  //works both in IE and Netscape
+				{
+					bsuccess=true;
+				}
+		}
+	}
+	
+	if (bsuccess)
+		return true;
+	else
+	{
+		addError(gErrRadioFieldRequiredMsg, strLabel, strPropertyName)
+		return false;
+	}
+}
+
+//Added By Lalitha on 3rd August ,01
+//====================================================== REQUIRED check box VALIDATION
+// Check Box must be selected
+function validateCheckBoxRequired(objCheckBox, strLabel, strPropertyName)
+{
+	var bsuccess = false;
+	if (objCheckBox.length){ //this is false for a checkbox with a single option
+
+		for (i=0;i<objCheckBox.length;i++)
+		{
+			if(objCheckBox[i].checked)  //works both in IE and Netscape
+			{
+				bsuccess=true;
+				break;
+			}
+		}
+	} else {
+		if(objCheckBox.checked)  {
+			bsuccess=true;
+		}
+	}
+	
+	if (bsuccess)
+		return true;
+	else
+	{
+		addError(gErrCheckboxFieldRequiredMsg, strLabel, strPropertyName)
+		return false;
+	}
+}
+
+
+//Added By Laiqun Mao on May 2, 2001
+//====================================================== REQUIRED SELECTION VALIDATION
+// A selection other than blank must be made
+function validateSelectionRequired(objSelection, strLabel, strPropertyName)
+{
+	var strSelected = "";
+	if (objSelection.length)
+	{
+		for (var i=0; i < objSelection.length; i++){
+				if (objSelection[i].selected)
+					strSelected = objSelection[i].value;
+			}	
+	}else {
+		if (objSelection.value)
+			strSelected = objSelection.value;
+	}
+	
+	if (strSelected == "")	{
+		addError(gErrSelectionRequiredMsg, strLabel, strPropertyName)
+		return false;
+	} else	{
+		return true;
+	}
+}
+
+// turns all red Xs on the page back to the "disabled" image.
+function clearXs()
+
+{
+	var i;
+	
+	for (i=0;i<document.images.length;i++)
+	{
+		if ((document.images[i].name)&&(document.images[i].name != ""))
+		{
+			if (document.images[i].name.search(/^(err)/i) == 0)
+			{
+				document.images[i].src = gImgErr0.src;
+			}
+		}
+	}
+}
+
+//Added by Pandi on Apr 05,01
+//Credit Card Number Validation
+function ValidateIsCreditNumber(strvalue, strLabel, strPropertyName) 
+{
+	var ccNum  = new Number(strvalue.length);
+	if (ccNum < 13 || ccNum > 20) 
+	{		
+		addError(gErrCreditCardMsg, strLabel, strPropertyName);
+		return false;
+	}
+return true;
+}
+function validateYear(userEntry, strLabel, strPropertyName)
+{
+	var blnReturn;
+	
+	if (userEntry == "")
+		return true;
+
+	if (userEntry.length == 4)
+	{
+		if (userEntry.search(/^\d{4}$/) > -1)
+		{
+			blnReturn = true;
+		}
+		else
+		{
+			blnReturn = false;
+		}
+	}
+	else
+	{
+		blnReturn = false;
+	}
+	
+	if (blnReturn == true)
+	{
+		return true;
+	}
+	else
+	{
+		addError(gErrInvalidYearMsg, strLabel, strPropertyName);
+		return false;
+	}
+}
+//Added by Pandi on Apr 18 ,01
+//Reset the Form Fields
+function Reset(objform)
+{
+  var num = objform.elements.length;
+  for (var i=0;i<num;i++)
+  {
+    objform.elements[i].value = "";
+  }
+
+}
+
+//Added by pandi on apr 25 , 01
+function Validatefuturedate(userEntry, strLabel,strPropertyName)
+{		
+var todaydt = new Date();
+var month = todaydt.getMonth() + 1;
+var year = todaydt.getFullYear();
+var dt = todaydt.getDate();
+var sform 
+var tempDate
+var strtemp
+if (userEntry != "")
+tempDate =  getDisplayDateLocale(userEntry);
+
+if (isLocaleUK())
+sform  = dt + "/" + month + "/" + year;
+else 
+sform  = month + "/" + dt + "/" + year; 
+
+strtemp= getDisplayDateLocale(sform)
+//Compare the dates by making it point to one standard format " eg: May 05 2009 
+if (Date.parse(strtemp) < Date.parse(tempDate)) { addError(gErrInvalidFutureDate, strLabel, strPropertyName);return false; }
+return true;
+}
+
+//ashwin
+function validateSequencedDates(strBeginDate, strEndDate, blnZeroDiffOK, strLabel, strPropertyName)
+{
+	var lngDiff;
+	
+	//both are blank - return true
+	if (strBeginDate == "" && strEndDate == "")
+	{
+		return true;
+	}
+	else if (!(strBeginDate != "" && strEndDate != ""))
+	{
+		addError(gErrOneBlankDateEntry, strLabel, strPropertyName);
+		return false;
+	}
+
+	if (validateDate("Start Date", strBeginDate) && validateDate("End Date", strEndDate))
+	{
+		lngDiff = daysBetween(strBeginDate, strEndDate, false);
+
+		if (lngDiff > 0)
+		{
+			return true;
+		}
+		else if (lngDiff < 0)
+		{
+			addError(gErrSequencedDate, strLabel, strPropertyName);
+			return false;
+		}
+		else if (blnZeroDiffOK)
+		{
+			return true;
+		}
+		else
+		{
+		    addError(gErrSequencedDate, strLabel, strPropertyName);
+			return false;
+		}
+	}
+	else
+	{
+	    addError(gErrInvalidDateEntry, strLabel, strPropertyName);
+		return false;  //invalid date or dates
+	}
+}
+
+//ashwin
+//-- Return number of days between two strings representing dates objects.
+function daysBetween(strEarlyDate, strLaterDate, blnFloorTheDifference)
+{
+    //i-Class UK Change
+    strEarlyDate = getDisplayDateLocale(strEarlyDate);
+    earlyDate = strEarlyDate;
+    strLaterDate = getDisplayDateLocale(strLaterDate);
+    laterDate = new Date(strLaterDate);
+    var earlySecs=earlyDate.getTime();
+	var laterSecs=laterDate.getTime();
+	if (blnFloorTheDifference)
+	{
+		return Math.floor ((((((laterSecs-earlySecs)/1000)/60)/60)/24));
+	}
+	else
+	{
+		return ((((((laterSecs-earlySecs)/1000)/60)/60)/24));
+	}
+}
+
+//ashwin
+//Return true if the string has no special chars
+//reurn false if the string has special chars
+function validateNoSpecialChars(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChars;
+	myRegExp = /[^\w -_]/g;
+	blnFoundChars = myRegExp.test(strIn);
+	if (blnFoundChars)
+	{
+		addError(gErrInvalidSpecialChars, strLabel, strPropertyName);
+	}
+	return (!blnFoundChars);
+}
+
+//Ram
+//to check textArea box maxlength
+function validateTextAreaLength(strUserEntry, strLabel,  strPropertyName, intLength)
+{
+	strUserEntry = trimString(strUserEntry);
+	if (strUserEntry.length > intLength)
+	{
+		addError(gErrTextAreaLengthMsg + intLength + " characters", strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+
+function validateCheckBox(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+	if (strUserEntry == "false")
+	{
+		addError(gErrCheckBoxCofirmationMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+
+//============================================================ HTML ?
+/*
+Name : validateIsHTML
+Author : Travn
+Parameters : 
+	strUserEntry - string to checked for proper XSL/HTML formatting
+	strLabel - Label of the field that is being validated
+	strPropertyName - Property affected, pass null string if none.
+	[special?] - optional 4th param - changes rules a little if string
+			containing "special" is passed.
+Purpose : To validate whether or not some string adheres to the
+	formatting rules required by the MSXML3 XSL parser.
+*/
+function validateIsHTML(str, strLabel, strPropertyName)  //optional 4th param - "special" changes rules a little, search for "special" in function to see details.
+{
+	var arrTags = new Array();
+	var endNamePos;
+	var strTag;
+	var strTagName;
+	var strParams;
+	var strPattern;
+	var intPos1 = str.indexOf("<", 0);
+	var intPos2 = str.indexOf(">", 0);
+	str = str.replace(/\t+/g, " ")
+	str = str.replace(/ +/g, " ")
+	if (intPos1 > -1)
+	{
+		while (intPos1 > -1)
+		{
+			if ((intPos1 > intPos2) && (intPos2 != -1))
+			{
+				addError("Invalid end bracket.", strLabel, strPropertyName);
+				return false;
+			}
+			revStr = "";
+			intPos2 = str.indexOf(">", (intPos1 + 1));
+			if (intPos2 == -1)
+				intPos2 = str.length
+			strTag = str.slice((intPos1 + 1), (intPos2 + 1));
+			if (arguments[3] == "special")
+				strPattern = /(^[\w|:]+)/;			// Manage Email allows namespaces (using :) for xsl like "<xsl:if...."
+			else
+				strPattern = /(^\w+)/;
+			if (strTag.search(strPattern) == 0)   // this must be an opening tag.....
+			{
+				strTagName = RegExp.$1;
+				strParams = strTag.slice(strTagName.length, strTag.length - 1);
+				//paramater string should roughly follow the format " somthing='xxxx'" some number of times.
+				if (strParams.search(/^(\s+\w+=(("[^"'\&\$]+")|('[^"'\&\$]+'))\s*)*(\s*\/)?$/) != 0)
+				{
+					addError("Invalid HTML paramter group - " + strParams, strLabel, strPropertyName);
+					return false;
+				}
+				if (strTag.charAt(strTag.length - 2) != "/")   //if this tag ends with a "/", then it doesn't get added to the array because it ends itself
+					arrTags[arrTags.length] = strTagName;
+			}
+			else if (strTag.search(/(^\/)/) == 0)   // it must be an end tag, it's partner must be the last element in the array
+			{
+				if (arguments[3] == "special")
+					endNamePos = strTag.search(/\s|\>/);	// Manage email allows end-tags to have parameters (therefore spaces)..
+				else
+					endNamePos = strTag.search(/\>/);
+				strTagName = strTag.slice(1, endNamePos);
+				if (arguments[3] == "special")	// Manage email allows end-tags to have parameters..
+				{
+					strParams = strTag.slice(strTagName.length+1, strTag.length - 1);
+					//paramater string should roughly follow the format " somthing='xxxx'" some number of times.
+					if (strParams.search(/^(\s+\w+=(("[^"'\&\$]+")|('[^"'\&\$]+'))\s*)*(\s*\/)?$/) != 0)
+					{
+						addError("Invalid HTMLdd paramter group - " + strParams, strLabel, strPropertyName);
+						return false;
+					}
+				}
+				if (arrTags[arrTags.length - 1] == strTagName)
+					arrTags = arrTags.slice(0, -1);
+				else
+				{
+					if (arrTags.length == 0)
+						addError("End tag '" + strTagName + "' has no start tag", strLabel, strPropertyName);
+					else
+						addError("End tag '" + strTagName + "' does not match start tag '" + arrTags[arrTags.length - 1] + "'", strLabel, strPropertyName);
+					return false;
+				}
+			}
+			else   //it must be an ill-formatted tag!
+			{
+				addError("Invalid HTML tag format - '<" + strTag.slice(0,4) + "...'", strLabel, strPropertyName);
+				return false;
+			}
+			intPos1 = str.indexOf("<", (intPos1 + 1));
+			intPos2 = str.indexOf(">", (intPos2 + 1));
+		}
+	}
+	else
+	{
+		if (str.indexOf(">", 0) > -1)
+		{
+			addError("Invalid end bracket.", strLabel, strPropertyName);
+			return false;
+		}
+	}
+
+	if (arrTags.length != 0)
+	{
+		addError("Start tag '" + arrTags[arrTags.length - 1] + "' has no end tag.", strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//============================================================ FORMAT
+/* Validate the format specified for the question.  This simple sets the pattern and the 
+userEntry either passes or fails the match.  Error messages are customizable to include
+the actual format that the user is required to use.  */
+function validateFormat(strFormat, strUserEntry, strLabel, strPropertyName, blnAllowTime){
+	/* use either a regular expression pattern or return validation from
+	another function.  More validations can be added here as they are needed*/
+	var rxPattern;
+	var testpat;
+	
+	switch (strFormat)
+	{
+		case "###" :
+			rxPattern = /^\d{3}$/;
+			break;
+		case "####" :
+			rxPattern = /^\d{4}$/;
+			break;
+		case "email" :
+			return ValidateemailCheck(trimString(strUserEntry), strLabel, strPropertyName);
+			break;
+		case "zz#.#" :
+			rxPattern = /^\d{1,3}\.\d$/;
+			break;
+		case "#.#" :
+			rxPattern = /^\d\.\d$/;
+			break;
+		case "zz#.##" :
+			rxPattern = /^\d{1,3}\.\d{2}$/;
+			break;
+		case "#.##" :
+			rxPattern = /^\d\.\d{2}$/;
+			break;
+		case "zz#.###" :
+			rxPattern = /^\d{1,3}\.\d{3}$/;
+			break;
+		case "zz#.##" :
+			rxPattern = /^\d{1,3}\.\d{3}$/;
+			break;
+		case "#.###" :
+			rxPattern = /^\d\.\d{3}$/;
+			break;
+		case "###-####" :
+			rxPattern = /^\d{3}-\d{4}$/;
+			break;
+		case "###.####" :
+			rxPattern = /^\d{3}\.\d{4}$/;
+			break;
+		case "###.###.####" :
+			rxPattern = /^\d{3}\.\d{3}\.\d{4}$/;
+			break;
+		case "###-###-####" :
+			rxPattern = /^\d{3}-\d{3}-\d{4}$/;
+			break;
+		case "###/###-####" :
+			rxPattern = /^\d{3}\/\d{3}-\d{4}$/;
+			break;
+		case "###/###.####" :
+			rxPattern = /^\d{3}\/\d{3}\.\d{4}$/;
+			break;
+		case "(###) ###-####" :
+			rxPattern = /^\(\d{3}\) \d{3}-\d{4}$/;
+			break;
+		case "(###)###-####" :
+			rxPattern = /^\(\d{3}\)\d{3}-\d{4}$/;
+			break;
+		case "(###)###.####" :
+			rxPattern = /^\(\d{3}\)\d{3}\.\d{4}$/;
+			break;
+		case "###-##-####" :
+			rxPattern = /^\d{3}-\d{2}-\d{4}$/;
+			break;
+		case "#########" :
+			rxPattern = /^\d{9}$/;
+			break;
+		case "Upper" :
+			return validateIsAlphaUpper(strUserEntry, strLabel, strPropertyName);
+			break;
+		case "Lower" :
+			return validateIsAlphaLower(strUserEntry, strLabel, strPropertyName);
+			break;
+		case "Mixed" :
+			return validateIsAlphaMixed(strUserEntry, strLabel, strPropertyName);
+			break;
+		case "#####-####" :
+			rxPattern = /^\d{5}-\d{4}$/;
+			break;
+		case "#####" :
+			rxPattern = /^\d{5}$/;
+			break;
+		case "A#A #A#" :
+			rxPattern = /^[A-Z]\d[A-Z] \d[A-Z]\d$/;
+			break;
+			
+		case "MM/DD/YYYY" :
+			
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}\/\d{1,2}\/\d{4}(\ \d{1,2}\:\d{1,2}\:\d{1,2}\ (AM|PM|am|pm))*$/;
+			} else {
+				rxPattern = /^\d{2}\/\d{2}\/\d{4}$/;
+			}
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				if (blnAllowTime) {
+					addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat + " or " + strFormat + " HH:MM:SS AM (or PM)"), strLabel, strPropertyName);
+					return false;
+					break;
+				} else {
+					addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+					return false;
+					break;
+				}
+			}
+			return validateDates(strUserEntry, strLabel, strPropertyName, strFormat, true);
+			break;
+			
+		case "MM-DD-YYYY" :
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}-\d{1,2}-\d{4}$/;
+			} else {
+				rxPattern = /^\d{2}-\d{2}-\d{4}$/;
+			}
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+				return false;
+				break;
+			}
+			return validateDates(strUserEntry, strLabel, strPropertyName, strFormat, true);
+			break;
+			
+		case "MM/YYYY" :
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}\/\d{4}$/;
+			} else {
+				rxPattern = /^\d{2}\/\d{4}$/;
+			}
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+				return false;
+				break;
+			}
+			return validateMonthYears(strUserEntry, strLabel, strPropertyName, strFormat);
+			break;
+			
+		case "MM-YYYY" :
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}-\d{4}$/;
+			} else {
+				rxPattern = /^\d{2}-\d{4}$/;
+			}			
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+				return false;
+				break;
+			}
+			return validateMonthYears(strUserEntry, strLabel, strPropertyName, strFormat);
+			break;
+			
+		case "DD/MM/YYYY" :
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+			} else {
+				rxPattern = /^\d{2}\/\d{2}\/\d{4}$/;
+			}
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				//addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+				addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat + " or " + strFormat + " HH:MM:SS AM (or PM)"), strLabel, strPropertyName);
+				return false;
+				break;
+			}
+			return validateDates(strUserEntry, strLabel, strPropertyName, strFormat, false);
+			break;
+			
+		case "DD-MM-YYYY" :
+			if (blnAllowTime) {
+				rxPattern = /^\d{1,2}-\d{1,2}-\d{4}$/;
+			} else {
+				rxPattern = /^\d{2}-\d{2}-\d{4}$/;
+			}
+			if (strUserEntry.match(rxPattern, "g") == null)
+			{
+				addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+				return false;
+				break;
+			}
+			return validateDates(strUserEntry, strLabel, strPropertyName, strFormat, false);
+			break;
+
+
+        case "YYYY":
+            return validateProperYear(strUserEntry, strLabel, strPropertyName, strFormat);
+            break;
+	
+	}
+	
+	if (strUserEntry.match(rxPattern, "g") == null)
+	{
+		addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//Checks if the passed in string contains single or/and double quotes "' or not
+//Return true if the string does not contain ', "
+//reurn false if the string contains ', "
+function validateNoSingleDoubleQuotes(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChar;
+	
+	if (strIn.search(/['"]/g) > -1)
+	{
+		addError(gErrInvalidChars, strLabel, strPropertyName);
+	}
+	return (!blnFoundChar);
+}
+
+//Checks if the passed in string contains double quotes " or not
+//Return true if the string does not contain "
+//reurn false if the string contains "
+function validateNoDoubleQuotes(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChar;
+	
+	if (strIn.search(/["]/g) > -1)
+	{
+		addError(gErrInvalidCharacter, strLabel, strPropertyName);
+	}
+	return (!blnFoundChar);
+}
+
+//Checks if the passed in string contains spaces or not
+//Return true if the string does not contain space(s)
+//reurn false if the string contains space(s)
+function validateNoSpaces(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChar;
+	
+	if (strIn.search(/[\s]/g) > -1)
+	{
+		addError(gErrNoSpaceMsg, strLabel, strPropertyName);
+	}
+	return (!blnFoundChar);
+}
+
+//Checks if the passed in string contains single quotes, commas, and/or space
+//Return true if the string does not contain single quote, comma, space
+//reurn false if the string contains single quote, comma, or space
+function validateNoSingleQuoteCommaSpace(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChar;
+	
+	if (strIn.search(/['"\s]/g) > -1)
+	{
+		addError(gErrInvalidPasswordChars, strLabel, strPropertyName);
+	}
+	return (!blnFoundChar);
+}
+
+//Checks if the passed in string contains single quotes, commas, and/or space
+//Return true if the string does not contain single quote, comma, space
+//reurn false if the string contains single quote, comma, or space
+function validateNoSingleQuoteComma(strIn, strLabel, strPropertyName)
+{
+	var blnFoundChar;
+	
+	if (strIn.search(/['"]/g) > -1)
+	{
+		addError(gErrInvalidPasswordChars, strLabel, strPropertyName);
+	}
+	return (!blnFoundChar);
+}
+
+//========================================================== NUMERIC & % VALIDATION
+// User Entry must be numeric
+function validateIsNumericPercentage(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/[^0-9.%]/g) > -1)
+	{
+		addError(gErrRequiredNumberPercentageMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//Added by pandi for School code look up on 01/17/02
+function disable(elem) 
+{ 
+	return elem.blur();
+}
+ 
+
+ /*Added on 02/28/2002 by Lalitha
+ //Function to validate a date in dd/mm/yyyy or dd-mm-yyyy or mm-dd-yyyy or mm/dd/yyyy format
+ blnStdDate - mm/dd/yyyy or mm-dd-yyyy - True
+ blnStdDate - dd/mm/yyyy or dd-mm-yyyy - False
+ */
+ function validateDates(strUserEntry, strLabel, strPropertyName, strFormat, blnStdDate)
+ {
+    var dateStr = strUserEntry;
+	var i;
+	var rxPattern;
+	var day,month,year;
+	day =0;
+	month=0;
+	year=0;
+	if (strFormat == "MM/DD/YYYY" || strFormat == "DD/MM/YYYY" || strFormat == "MM/DD/YYYY Or MM/DD/YYYY HH:MM:SS AM or PM" || strFormat == "DD/MM/YYYY Or DD/MM/YYYY HH:MM:SS AM or PM")
+	{
+		rxPattern = /^\d{1,2}\/\d{1,2}\/\d{4}(\ \d{1,2}\:\d{1,2}\:\d{1,2}\ (AM|PM|am|pm))*$/;	
+	}
+	else if (strFormat == "MM-DD-YYYY" || strFormat == "DD-MM-YYYY")
+	{
+		rxPattern = /^\d{1,2}-\d{1,2}-\d{4}(\ \d{1,2}\:\d{1,2}\:\d{1,2}\ (AM|PM|am|pm))*$/;
+	}
+
+	if (strUserEntry.match(rxPattern, "g") == null)
+	{
+		addError(gErrInvalidFormatMsg.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+  
+	var datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})((\ )(\d{1,2})(\:)(\d{1,2})(\:)(\d{1,2})\ (AM|PM|am|pm))*$/;
+	var matchArray = dateStr.match(datePat);
+
+		
+	if (matchArray == null) 
+	{
+		addError(gErrInvalidDateFormats.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+  if (getLocaleDateFormat(strFormat).toUpperCase() == "USFORMAT")
+  {
+            month = matchArray[1];
+     		day = matchArray[3]; 
+  } 
+  else if (getLocaleDateFormat(strFormat).toUpperCase() == "UKFORMAT")
+   {
+        	day = matchArray[1];
+	        month = matchArray[3]; 
+   }    
+	        
+	year = matchArray[4];
+	//datetime sql datatype can't take years less than 1753
+	if (year < 1753)
+	{
+		addError(gErrInvalidSQLYear, strLabel, strPropertyName);
+		return false;
+	}	
+	
+	if (day < 1 || day > 31) 
+	{
+		addError(gErrInvalidDay, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if (month < 1 || month > 12) 
+	{
+		addError(gErrInvalidMonth, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if ((month==4 || month==6 || month==9 || month==11) && day==31) 
+	{
+		addError(gErrInvalid31Day.replace(/STRFORMAT/g, month), strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (month == 2) 
+	{ 
+		var isleap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+		if (!isleap && (day > 28) )
+		{
+			addError(gErrInvalidFebDay.replace(/STRFORMAT/g, year), strLabel, strPropertyName);
+			return false;	
+		}
+				
+		if (isleap && (day > 29))
+		{
+			addError(gErrInvalidFebLeapYearDay.replace(/STRFORMAT/g, year), strLabel, strPropertyName);
+			return false;
+		}
+	}	
+	
+	//here starts time validation, check if array contains any time value then continue validation, 5th element should
+	//contain the whole time value
+
+	if (matchArray[5] != "") {
+		//get the time fields
+		hours = matchArray[7];
+		minutes = matchArray[9];
+		seconds = matchArray[11];
+		
+		if (hours < 0 || hours > 12)
+		{	addError(gErrInvalideHour.replace(/STRFORMAT/g, hours), strLabel, strPropertyName);
+			return false;
+		}	
+			
+		if (minutes < 0 || minutes > 59)
+		{	addError(gErrInvalideMinute.replace(/STRFORMAT/g, minutes), strLabel, strPropertyName);
+			return false;
+		}	
+
+		if (seconds < 0 || seconds > 59)
+		{	addError(gErrInvalideSecond.replace(/STRFORMAT/g, seconds), strLabel, strPropertyName);
+			return false;
+		}	
+	}
+							
+	return true;
+}
+
+ /*Added on 03/21/2002 by Lalitha
+ //Function to validate a date in dd/mm/yyyy or dd-mm-yyyy or mm-dd-yyyy or mm/dd/yyyy format
+ within the SQL Server 2000 smalldatetime date range
+ Date range is 01/01/1900 -  06/06/2079 ie 01/01/1900 to today
+ */
+ function validateSQLSmallDateTimeDateRange(strUserEntry, strLabel, strPropertyName, strFormat)
+ {
+	var dateStr = strUserEntry;
+			
+	var datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
+	var matchArray = dateStr.match(datePat);
+		
+	if (matchArray == null) 
+	{
+		addError(gErrInvalidSQLDateFormat, strLabel, strPropertyName);
+		return false;
+	}
+	
+	//Flux-293, AYI - 195  iClassUK-DOB in application account creation page is date as "mm/dd/yyyy" format. 
+	 if (getLocaleDateFormat(strFormat).toUpperCase() == "USFORMAT")
+      {
+            month = matchArray[1];
+	        day = matchArray[3]; 
+	        year = matchArray[4];
+      } 
+  else if (getLocaleDateFormat(strFormat).toUpperCase() == "UKFORMAT")
+       {
+            month = matchArray[3];
+	        day = matchArray[1]; 
+	        year = matchArray[4];
+       }    
+	
+	/*
+	  Checks to ensure that a valid Date of Birth is input.
+		1. Year should not be greater than the current year.
+		2. If year = current year, then month should not be greater than the current month.
+		3. If year=current year, month = current month, then day should not be greater than today		
+	*/ 
+		
+	var dateObj = new Date();
+	nCurrentDate= dateObj.getDate();
+	nCurrentMonth= dateObj.getMonth()+1;
+	nCurrentYear= dateObj.getFullYear();	
+	
+	if (year > nCurrentYear)
+	{
+		addError(gErrInvalidSQLCurrentYear, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if ((year == nCurrentYear) && (month > nCurrentMonth))
+	{
+		addError(gErrInvalidSQLCurrentMonth, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if ((year == nCurrentYear) && (month == nCurrentMonth) && (day > nCurrentDate))
+	{
+		addError(gErrInvalidSQLCurrentDay, strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (year < 1900)
+	{
+		addError(gErrInvalidSQLBirthYear, strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (day < 1 || day > 31) 
+	{
+		addError(gErrInvalidDay, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if (month < 1 || month > 12) 
+	{
+		addError(gErrInvalidMonth, strLabel, strPropertyName);
+		return false;
+	}
+		
+	if ((month==4 || month==6 || month==9 || month==11) && day==31) 
+	{
+		addError(gErrInvalid31Day.replace(/STRFORMAT/g, month), strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (month == 2) 
+	{ 
+		var isleap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+		if (!isleap && (day > 28) )
+		{
+			addError(gErrInvalidFebDay.replace(/STRFORMAT/g, year), strLabel, strPropertyName);
+			return false;	
+		}
+				
+		if (isleap && (day > 29))
+		{
+			addError(gErrInvalidFebLeapYearDay.replace(/STRFORMAT/g, year), strLabel, strPropertyName);
+			return false;
+		}
+	}
+							
+	return true;
+}
+
+ //Added on 04/04/2002 by Lalitha
+ //Function to validate a month and year in mm/yyyy or mm-yyyy format
+ function validateMonthYears(strUserEntry, strLabel, strPropertyName, strFormat)
+ {
+	var dateStr = strUserEntry;
+			
+	var datePat = /^(\d{1,2})(\/|-)(\d{4})$/;
+	var matchArray = dateStr.match(datePat);
+		
+	if (matchArray == null) 
+	{
+		addError(gErrInvalidDateFormats.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+	
+	month = matchArray[1];
+	year = matchArray[3];
+	
+	if (month < 1 || month > 12) 
+	{
+		addError(gErrInvalidMonth, strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (year <= 0) 
+	{
+		addError(gErrInvalidYearMsg, strLabel, strPropertyName);
+		return false;
+	}
+	
+	return true;
+}
+
+function validateProperYear(strUserEntry, strLabel, strPropertyName, strFormat)
+{
+    var rxPattern = /^\d{4}$/;
+   	
+	if (strUserEntry.match(rxPattern, "g") == null)
+	{
+		addError(gErrInvalidDateFormats.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+	
+	if (strUserEntry <= 0) 
+	{
+		addError(gErrInvalidYearMsg, strLabel, strPropertyName);
+		return false;
+	}
+	
+	return true;
+	
+}
+
+function CheckDateBounds(strUserEntry, LowerBound, UpperBound, strLabel, strPropertyName, strFormat)
+{
+	var blnStdDate;
+	if (strFormat == "MM/YYYY" || strFormat == "MM-YYYY")  
+	{
+		// validate month/year range
+		return CheckMonthYearBounds(strUserEntry, LowerBound, UpperBound, strLabel, strPropertyName, strFormat)
+    }
+
+    if (strFormat == "YYYY")
+    {
+        // validate year range
+        return CheckYearBounds(strUserEntry, LowerBound, UpperBound, strLabel, strPropertyName, strFormat);     
+    }
+	
+	
+	if (strFormat == "MM/DD/YYYY" || strFormat == "MM-DD-YYYY")
+	{
+		blnStdDate = true;
+	}
+	else if(strFormat == "DD/MM/YYYY" || strFormat == "DD-MM-YYYY")
+	{
+		blnStdDate = false;
+	}
+	
+	if (validateDates(strUserEntry, strLabel, strPropertyName, strFormat, blnStdDate))
+	{
+	    return CompareDates(strUserEntry, LowerBound, UpperBound, strLabel, strPropertyName, strFormat)	
+	}
+	else
+		return false;
+	
+	
+}
+
+// check  month/year range
+function CheckMonthYearBounds(strUserEntry, startDate, endDate, strLabel, strPropertyName, strFormat)
+{
+	if (strUserEntry == "")
+	{
+		addError(gErrInvalidDateFormats.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+		return false;
+	}
+	
+	var userValue, userMonth, userYear;
+	var lowerBound, lowerMonth,  lowerYear;
+	var upperBound, upperMonth,  upperYear;	
+	
+	var datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
+	var userValue = strUserEntry.match(/^(\d{1,2})(\/|-)(\d{4})$/);
+	var lowerBound = startDate.match(datePat);
+	var upperBound = endDate.match(datePat);
+	userMonth = userValue[1];
+	userYear = userValue[3];
+	lowerYear = lowerBound[4];
+	upperYear = upperBound[4];
+	if (isLocaleUK())
+    {
+		lowerMonth = lowerBound[3];
+		upperMonth = upperBound[3];
+	} else	{
+		lowerMonth = lowerBound[1];
+		upperMonth = upperBound[1];
+	}
+	if ((userYear > upperYear) || 
+	    ((userYear == upperYear) && (userMonth > upperMonth)))
+	{
+		addError(gErrAboveDateRange, strLabel, strPropertyName);
+		return false;
+	}
+	
+	if ((userYear < lowerYear) || 
+	    ((userYear == lowerYear) && (userMonth < lowerMonth)))
+	{
+		addError(gErrBelowDateRange, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+// check  year range/bounds
+function CheckYearBounds(strUserEntry, startDate, endDate, strLabel, strPropertyName, strFormat)
+{
+    if (strUserEntry == "")
+    {
+        addError(gErrInvalidDateFormats.replace(/STRFORMAT/g, strFormat), strLabel, strPropertyName);
+        return false;
+    }
+
+    var lowerBound, lowerYear;
+    var upperBound, upperYear;
+
+    var datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
+    var lowerBound = startDate.match(datePat);
+    var upperBound = endDate.match(datePat);
+    
+    lowerYear = lowerBound[4];
+    upperYear = upperBound[4]; 
+
+    if ( parseInt(strUserEntry) > parseInt(upperYear) ) 
+    {
+        addError(gErrAboveDateRange, strLabel, strPropertyName);
+        return false;
+    }
+
+    if ( parseInt(strUserEntry) < parseInt(lowerYear) )
+    {
+        addError(gErrBelowDateRange, strLabel, strPropertyName);
+        return false;
+    }
+    
+    return true;
+}
+
+
+
+function CompareDates(strUserEntry, LBound, UBound, strLabel, strPropertyName, blnstdDate)
+{
+	var datePat;
+	var userValue, userMonth, userDay, userYear;
+	var lowerBound, lowerMonth, lowerDay, lowerYear;
+	var upperBound, upperMonth, upperDay, upperYear;	
+	
+	datePat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
+	userValue = strUserEntry.match(datePat);
+	lowerBound = LBound.match(datePat);
+	upperBound = UBound.match(datePat);
+
+	if (blnstdDate)
+	{
+		userMonth = userValue[1];
+		userDay = userValue[3];
+		lowerMonth = lowerBound[1];
+		lowerDay = lowerBound[3];
+		upperMonth = upperBound[1];
+		upperDay = upperBound[3];
+	}
+	else
+	{
+		userMonth = userValue[3];
+		userDay = userValue[1];
+		lowerMonth = lowerBound[3];
+		lowerDay = lowerBound[1];
+		upperMonth = upperBound[3];
+		upperDay = upperBound[1];
+	}
+	
+	userYear = userValue[4];	
+	lowerYear = lowerBound[4];
+	upperYear = upperBound[4];
+	
+	if ((userYear > upperYear) || 
+	    ((userYear == upperYear) && (userMonth > upperMonth)) || 
+		((userYear == upperYear) && (userMonth == upperMonth) && (userDay > upperDay)))
+	{
+		addError(gErrAboveDateRange, strLabel, strPropertyName);
+		return false;
+	}
+	
+	if ((userYear < lowerYear) || 
+	    ((userYear == lowerYear) && (userMonth < lowerMonth)) || 
+		((userYear == lowerYear) && (userMonth == lowerMonth) && (userDay < lowerDay)))
+	{
+		addError(gErrBelowDateRange, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+function validateBounds(strBeginDate, strEndDate, blnZeroDiffOK, strLabel, strPropertyName)
+{
+	var lngDiff;
+	
+	//both are blank - return true
+	if (strBeginDate == "" && strEndDate == "")
+	{
+		return true;
+	}
+	else if (!(strBeginDate != "" && strEndDate != ""))
+	{
+		addError(gErrOneBlankDateEntry, strLabel, strPropertyName);
+		return false;
+	}
+		
+	lngDiff = daysBetween(strBeginDate, strEndDate, false);
+	
+	if (lngDiff > 0)
+	{
+		return true;
+	}
+	else if (lngDiff < 0)
+	{
+		addError(gErrSequencedDate, strLabel, strPropertyName);
+		return false;
+	}
+	else if (blnZeroDiffOK)
+	{
+		return true;
+	}
+	else
+	{
+		addError(gErrSequencedDate, strLabel, strPropertyName);
+		return false;
+	}
+	
+}
+
+function PopulateValue(len,arrOfQuesIDs)
+{
+
+	for (var i=0;i<len;i++)
+	{		
+		if ( eval('document.frmMain.hq_' + arrOfQuesIDs[i] + '.value') != '' )
+			getElement(arrOfQuesIDs[i]).value = eval('document.frmMain.hq_' + arrOfQuesIDs[i] + '.value');
+		else					
+			getElement(arrOfQuesIDs[i]).value = eval('document.frmMain.hiddenq' + arrOfQuesIDs[i] + '.value');		
+	} 
+}
+
+// getBatchUpdateElement - this function returns a form element object given that elements ID
+function getBatchUpdateElement(strID)
+{
+	strID = strID.toString();
+	var objForm = document.frmBatchUpdate;
+	
+	//Loop through all of our form elements
+	for (var x=0;x<objForm.elements.length;x++)
+	{
+		if ((objForm.elements[x].name) && ((objForm.elements[x].name.substr(0, (strID.length))) == (strID)))
+		{
+			return objForm.elements[x];
+		}
+	}
+	return null;
+}
+
+/* getRRElement - this function returns a form element object given that elements ID
+Example- getElement(firstname); returns the element named "firstname"*/
+function getRRElement(strID)
+{
+	strID = strID.toString();
+	var objForm = document.frmRequest_Recommendation;
+	
+	//Loop through all of our form elements
+	for (var x=0;x<objForm.elements.length;x++)
+	{
+
+		if ((objForm.elements[x].name) && (objForm.elements[x].name == strID))
+		{
+			if ((objForm.elements[x].type) && (objForm.elements[x].type == "radio"))
+			{
+				
+				var col = objForm.elements[objForm.elements[x].name]
+				return col;
+				
+			}
+			else if ((objForm.elements[x].type) && (objForm.elements[x].type == "checkbox"))
+			{
+				
+				var col = objForm.elements[objForm.elements[x].name]
+				return col;
+				
+			}
+			else
+			{
+				return objForm.elements[x];
+			}
+		}
+	}
+	return null;
+}
+function validateFileType(filepath) {
+
+	var blnAllowedExt = false;
+	var strAllowedExt = gDownLoadFormValidFileType;
+	var strExt = filepath.substr(filepath.lastIndexOf(".")).toLowerCase();
+	var extArr=strAllowedExt.split(",");
+		var len=extArr.length;
+		for (i=0;i<len;i++) {							
+			if (extArr[i] == strExt) {								
+				blnAllowedExt = true;								
+			}
+		}
+	
+	if (!blnAllowedExt) {
+		addError(gErrInvalidDownLoadFormFileType);	
+	}
+}
+
+function validateDateInFuture(userEntry, strLabel, strPropertyName)
+{		
+    var dtToday = new Date();
+
+    if (Date.parse((dtToday.getMonth() + 1) + "/" + dtToday.getDate() + "/" + dtToday.getFullYear()) > Date.parse(userEntry))
+    {
+        addError(gErrInvalidDateInFuture, strLabel, strPropertyName);
+        return false;
+    }
+    return true;
+}
+
+//Added by Lalitha on 6/30/2008
+//================================================ DATE FORMAT AND VALUE VALIDATION
+//This function will not throw an error to the user if it is not a valid date
+//this is added because we need to check if it is a validdate or not without throwing any error
+function IsDate(userEntry)
+{
+//i-Class UK Change
+if (isLocaleUK())
+    {
+    gDateEntryFormat = new Array("DD-MM-YYYY", "DD/MM/YYYY");
+   }           
+else { 
+   gDateEntryFormat = new Array("MM-DD-YYYY", "MM/DD/YYYY");
+     }
+     
+	userEntry = trimString(userEntry);
+
+	if (userEntry == "")
+		return true;
+	
+	var strMatchedPattern = "";
+	var err = 0;
+
+	// remove any spaces that may be in any of the date-format strings.
+	for (var cnt=0;cnt<gDateEntryFormat.length;cnt++)
+	{
+		gDateEntryFormat[cnt] = trimString(gDateEntryFormat[cnt])
+	}
+
+	// make sure that a date is both valid and in the correct format
+	for (var k=0;k<gDateEntryFormat.length;k++)
+	{
+		// set the appropriate search pattern given the date-format required.
+		if (gDateEntryFormat[k] == "MM-DD-YY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{2})$/;
+		else if (gDateEntryFormat[k] == "MM/DD/YY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{2})$/;
+		else if (gDateEntryFormat[k] == "MM-DD-YYYY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "MM/DD/YYYY")
+			var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "DD-MM-YYYY")
+			var rxPattern = /^(\d{1,2})(-)(\d{1,2})(-)(\d{4})$/;
+		else if (gDateEntryFormat[k] == "DD/MM/YYYY")
+		    var rxPattern = /^(\d{1,2})(\/)(\d{1,2})(\/)(\d{4})$/;		
+
+		// attempt to match a search pattern.  This is a comprehensive format check.
+		var arrPatternMatch = userEntry.match(rxPattern, "g");
+		if (arrPatternMatch != null)
+		{
+			strMatchedPattern = gDateEntryFormat[k];
+		}
+		// Set the global variable gDateFormatMatched so that other functions will know what format was matched.
+		gDateFormatMatched = strMatchedPattern;
+	}
+
+	if (strMatchedPattern != "")	// if a format was matched, check for the validity of the dates entered
+	{
+		var vMon , vDay , vYear
+		
+	if (isLocaleUK())
+    {
+        vDay = RegExp.$1;
+        vMon = RegExp.$3;
+		vYear = RegExp.$5;
+    }           
+    else { 
+        vMon = RegExp.$1;
+		vDay = RegExp.$3;
+		vYear = RegExp.$5;
+          }
+
+		if (vMon<1 || vMon>12) err = 2;
+		if (vDay<1 || vDay>31) err = 2;
+		if (vYear.length == 2)
+		{
+			if (vYear>g2DigitYearSplit)
+				vYear = 1900 + parseFloat(vYear);
+			else
+				vYear = 2000 + parseFloat(vYear);
+		}
+		else
+		{
+			if (vYear<1900 || vYear>9999) err = 2;
+		}
+		
+		if (vMon==4 || vMon==6 || vMon==9 || vMon==11)
+		{
+			if (vDay==31) err=2;
+		}
+		if (vMon==2)
+		{
+			var g=parseInt(vYear/4);
+			if (isNaN(g))
+			{
+				err=2;
+			}
+			if (vDay>29) err=2;
+			if (vDay == 29)  // NOTE - this is NOT Y4K compliant!!!
+			{
+				if ((vYear % 4) == 0)
+				{
+					if ((vYear % 100) == 0)
+					{
+						if ((vYear % 400) != 0)
+						{
+							err = 2;
+						}
+					}
+				}
+				else
+				{
+					err = 2;
+				}
+			}
+		}
+	}
+	else
+	{
+		err = 1;
+	}
+
+	if (err==1)			// Formatting errors return a 1...
+	{
+		return false;
+	}
+	else if (err==2)	// Invalid Entries return a 2...
+	{
+		return false;
+	}
+	else				// 0 indicates a good date...
+	{
+		return true;
+	}
+}
+
+//========================================================== NUMERIC VALIDATION
+// User Entry must be numeric
+//Added by Lalitha on 6/30/2008
+//This function will not throw an error to the user if it is not a numeric value
+//this is added because we need to check if it is a numeric value or not and proceed depending on that without throwing an error
+
+function IsNumeric(strUserEntry)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+		
+	if (strUserEntry.search(/[^0-9.]/g) > -1)
+	{
+		return false;
+	}
+	return true;
+}
+
+function IsNumericWithoutSpace(strUserEntry, strLabel, strPropertyName)
+{
+	if (strUserEntry.search(/[^0-9.]/g) > -1)
+	{
+		return false;
+	}
+	return true;	
+}
+
+function validateIsNumericWithoutSpace(strUserEntry, strLabel, strPropertyName)
+{
+	if (strUserEntry.search(/[^0-9.]/g) > -1)
+	{
+		addError(gErrRequiredNumberMsg, strLabel, strPropertyName);
+		return false;
+	}
+	return true;
+}
+
+//========================================================== CHARACTER VALIDATION
+// Function only allows upper or lowercase alpha characters. 
+//Added by Lalitha on 7/1/2008
+//This function will not throw an error to the user if it is not a alpha value
+//this is added because we need to check if it is a numeric value or not and proceed depending on that without throwing an error
+
+function IsAlpha(strUserEntry)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	if (strUserEntry.search(/[^a-zA-Z]/g) > -1)
+	{
+		return false;
+	}
+	return true;
+}
+
+function CheckSelectValues(strUserEntry, strLabel, strPropertyName)
+{
+    strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+
+	strUserEntry = strUserEntry.split(",");
+	
+	var len = strUserEntry.length;
+	if (len <= 1)
+	{
+	    addError("This operator requires multiple values to be selected.", strLabel, strPropertyName);
+	    return false;
+	}
+	
+	return true;
+}
+
+function CheckRanges(strValue, strMsg)
+{
+    var intSeparator;
+    var FirstValue, SecondValue;
+    strValue = strValue.toString();
+		
+	intSeparator = strValue.search(',');
+	if (intSeparator > 0)
+	{
+	    FirstValue = strValue.substr(0, intSeparator);
+	    SecondValue = strValue.substr(intSeparator+1);
+	    if ((FirstValue != "") && (SecondValue != ""))
+	    {
+	        if (IsDate(FirstValue) && IsDate(SecondValue))
+	        {
+	            return validateSequencedDates(FirstValue, SecondValue, false, strMsg, strMsg);
+	        }
+    	   
+	        if (IsNumeric(FirstValue) && IsNumeric(SecondValue))
+	        {			
+	            if ((parseInt(FirstValue) > parseInt(SecondValue)) || (parseInt(FirstValue) == parseInt(SecondValue)))
+	            {
+	                addError("First Value should be less than the Second Value", strMsg, strMsg);
+	                return false;
+	            }
+	            else
+	            {
+	                return true;
+	            }
+	        }
+    	    
+	        if (IsAlpha(FirstValue) && IsAlpha(SecondValue))
+	        {			
+	            if ((FirstValue.toUpperCase()) < (SecondValue.toUpperCase()))
+	            {
+	                return true;
+	            }
+	            else
+	            {
+	                addError("First Value should be less than the Second Value", strMsg, strMsg);
+	                return false;
+	            }
+	        }
+	    }
+	    else
+	    {
+	        addError("Values cannot be empty." , strMsg);
+	        return false;
+	    }
+	}
+	else
+	{
+	    return false;
+	}
+}
+
+//Added by Lalitha on 7/15/2008
+function loopSelected(intRow)
+{
+  var strSelectedValues = "";
+  
+   var htmlObj = eval("document.frmMain.txtValue" + intRow);
+   if ((htmlObj.options) && (htmlObj.options.length))
+   {
+      var i;
+      var count = 0;
+      for (i=0; i<htmlObj.options.length; i++)
+      {
+        if (htmlObj.options[i].selected)
+        {
+            if (strSelectedValues == "") 
+            {
+                strSelectedValues = htmlObj.options[i].value;
+            }
+            else
+            {
+                strSelectedValues += "," + htmlObj.options[i].value;
+            }
+         }
+      }
+   }
+  
+    return strSelectedValues;
+   
+}
+
+function getSelectedItemsCount(intRow)
+{
+   var htmlObj = eval("document.frmMain.txtValue" + intRow);
+   if ((htmlObj.options) && (htmlObj.options.length))
+   {
+      var i;
+      var count = 0;
+      for (i=0; i<htmlObj.options.length; i++)
+      {
+        if (htmlObj.options[i].selected)
+        {
+			count = count + 1;
+        }
+      }
+   }
+   return count;
+}
+
+function isLocaleUK()
+{
+  if (SetCustomLocale())
+  {
+   return SetCustomLocale()=='UK';
+  }
+ else
+   {
+    return false;
+   }
+
+ }
+
+//Added by Roshna on 03/02/2009
+// Function created for passing UK specific dates to daysBetween()
+function getDisplayDateLocale(passedDate) 
+{
+	var myJSDate;
+ //converts  MM/DD/YYYY or MM-DD-YYYY to DD/MM/YYYY or DD-MM-YYYY if locale = UK
+            
+	if (passedDate.indexOf("/") > -1 )
+	{  
+	   myJSDate = passedDate.split("/");        
+	}
+	else if (passedDate.indexOf("-") > -1)
+	{ 
+		myJSDate = passedDate.split("-");     
+	}
+      
+	if (isLocaleUK())
+	{
+		//takes the format of Date(yy,mm,dd)
+		return  new Date(myJSDate[2], myJSDate[1]-1, myJSDate[0]);
+	}
+	else
+	{
+	   return  new Date(myJSDate[2],myJSDate[0]-1, myJSDate[1]);  
+	}
+}
+
+//AYI-326 --- case# 00015543 Hyphenated Last Names On Creation of Account
+// Function does not allow --
+function validateWithoutDoubleDashes(strUserEntry, strLabel, strPropertyName)
+{
+	strUserEntry = trimString(strUserEntry);
+
+	if (strUserEntry == "")
+		return true;
+	
+	if ( strUserEntry.search(/\--/) > -1 )
+	{
+		addError(gErrDashesMsg, strLabel, strPropertyName);
+		return false;	
+	}
+}
+// AYI-434  European full date field format not working correctly
+function getLocaleDateFormat(strFormat)
+{
+    var strDateOutput="";
+     strFormat = strFormat.toUpperCase()
+    if  (strFormat == "MM/DD/YYYY" || strFormat == "MM-DD-YYYY" || strFormat == "MM/DD/YYYY OR MM/DD/YYYY HH:MM:SS AM OR PM")
+         strDateOutput = "USFORMAT";
+    else if (strFormat == "DD/MM/YYYY" || strFormat == "DD-MM-YYYY" || strFormat == "DD/MM/YYYY OR DD/MM/YYYY HH:MM:SS AM OR PM")
+         strDateOutput = "UKFORMAT"; 
+         
+    return strDateOutput ;
+}
+
+// AYI-1136 Check to see if Role has Users assigned to it - to send email
+function validateIsRoleAssigned(strUserEntry, strLabel, strPropertyName) {    
+    if (strUserEntry == 0) {
+        addError(gErrIsRoleAssignedMsg, strLabel, strPropertyName);
+        return false;
+    }
+
+    return true;
+}
+
+function displayErrorsInline(strSystemMessage)
+{
+    var Now = new Date();
+    var strUrl;
+
+    var aErrors = gErrString.split("|");
+    var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+	
+    if (aErrors.length >= 2)
+    {
+        strErrHTML = "<table cellspacing='0' cellpadding='3' border='2' width='95%' align='center' bordercolor='black'><tr>" +
+			"<td bgcolor='#ffffff' align='left' width='100%' class='BasePageFont'><br><font color='red'><b>System Message:</b></font>&nbsp;&nbsp;"
+
+        if (strSystemMessage == "") {
+            strErrHTML = strErrHTML + "Please review the details presented below for more information. If required questions on this page are not complete, " +
+			"they will be identified in the list below. All other page information will still be saved."
+        }
+        else
+        {
+            strErrHTML = strErrHTML + strSystemMessage;
+        }
+
+        strErrHTML = strErrHTML +  "<div align='center'><img src='../images/common_images/dividing_line.gif' width='98%' height='5' alt=''><br><br>" +
+			"<table border=1 bordercolor='black' cellspacing='0' cellpadding='0' width='98%'><tr><td width=100%>" +
+			"<table border=0 cellspacing='5' cellpadding='0' width='100%'>"
+    }
+
+    var sColor = "";
+    for (i = 0; i <= aErrors.length - 1; i++) {
+        if (aErrors[i] != "") {
+            arrElements = aErrors[i].split("^");
+
+            lngPropertyCnt = arrElements.length - 1;
+
+            if (lngPropertyCnt > 0) {
+                strError = arrElements[lngPropertyCnt];
+                strErrNum = arrElements[lngPropertyCnt - 1];
+            } else {
+                strError = arrElements[0];
+                strErrNum = "";
+            }
+
+            if (strError != "") {
+                strErrHTML = strErrHTML + "<tr " + sColor + "align='left' valign='top'>" +
+					"<td class='BaseTableFont' width='30%'>" + killChars(strErrNum, true) + "</td>" +
+					"<td class='BaseTableFont' width='70%'>" + killChars(strError, true) + "</td>" +
+					"</tr>";
+
+                sColor = (sColor == "" ? "bgcolor='#CCCCCC' " : "");
+            }
+        }
+    }
+
+    if ((strErrHTML != "") && (aErrors.length >= 2)) {
+        strErrHTML = strErrHTML + "<tr><td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='30%' height='10' alt=''></td>" +
+			"<td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='70%' height='10' alt=''></td></tr>" +
+			"</table></td></tr></table><br></div></td></tr></table><br>";
+
+        divErrors.innerHTML = "<font color='#004731'>" + strErrHTML + "</font>";
+        divErrors.style.display = "block";       
+    }
+
+    gErrString = "";
+}
+
+function fl_displayErrorsInline(strSystemMessage) {
+    var Now = new Date();
+    var strUrl;
+    var aErrors = gErrString.split("|");
+    var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+    strErrHTML = "<P><strong>System Message:</strong>"
+    strErrHTML = strErrHTML + "<br>"
+    if (strSystemMessage == "") 
+	{
+        strErrHTML = strErrHTML + "Please review the details presented below for more information. If required questions on this page are not complete, " +
+		"they will be identified in the list below. All other page information will still be saved."
+    }
+    else
+    {
+        strErrHTML = strErrHTML + strSystemMessage;
+    }
+	
+    strErrHTML = strErrHTML + "<ul>"
+    var sColor = "";
+    for (i = 0; i <= aErrors.length - 1; i++) {
+        if (aErrors[i] != "") {
+            arrElements = aErrors[i].split("^");
+
+            lngPropertyCnt = arrElements.length - 1;
+
+            if (lngPropertyCnt > 0) {
+                strError = arrElements[lngPropertyCnt];
+                strErrNum = arrElements[lngPropertyCnt - 1];
+            } else {
+                strError = arrElements[0];
+                strErrNum = "";
+            }
+
+            if (strError != "") {
+                if (strErrNum != "") {
+                    strErrHTML = strErrHTML + "<li class='inlineError clearfix'><div class='span4'>";
+                    strErrHTML = strErrHTML + killChars(strErrNum, true) + "</div><div class='span7'>";
+                    strErrHTML = strErrHTML + killChars(strError, true) + "</div></li>";
+                }
+                else {
+                    strErrHTML = strErrHTML + "<li class='inlineError clearfix'><div class='span7'>";
+                    strErrHTML = strErrHTML + killChars(strError, true) + "</div></li>";
+                }
+          }
+        }
+    }
+    strErrHTML = strErrHTML + "</ul>";
+    if ((strErrHTML != "") || (aErrors.length >= 2)) {
+        document.getElementById("divErrors").style.display = "block";
+        document.getElementById("divErrors").innerHTML = strErrHTML;
+    }
+    gErrString = "";
+}
+
+function fl_displayErrorsInline_msg(strSystemMessage) {
+    var Now = new Date();
+    var strUrl;
+    var aErrors = gErrString.split("|");
+    var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+    strErrHTML = "<P><strong>System Message:</strong>";
+    strErrHTML = strErrHTML + "<br>";
+    if (strSystemMessage == "") {
+        strErrHTML = strErrHTML + "Please review the details presented below for more information. If required questions on this page are not complete, " +
+		"they will be identified in the list below. All other page information will still be saved.";
+    }
+    else {
+        strErrHTML = strErrHTML + strSystemMessage;
+    }
+    strErrHTML = strErrHTML + "<ul>";
+    var sColor = "";
+    for (i = 0; i <= aErrors.length - 1; i++) {
+        if (aErrors[i] != "") {
+            arrElements = aErrors[i].split("^");
+
+            lngPropertyCnt = arrElements.length - 1;
+
+            if (lngPropertyCnt > 0) {
+                strError = arrElements[lngPropertyCnt];
+                strErrNum = arrElements[lngPropertyCnt - 1];
+            } else {
+                strError = arrElements[0];
+                strErrNum = "";
+            }
+
+            if (strError != "") {
+                if (strErrNum != "") {
+                    strErrHTML = strErrHTML + "<li class='inlineError clearfix'><div class='span4'>";
+                    strErrHTML = strErrHTML + killChars(strErrNum, true) + "</div><div class='span5'>";
+                    strErrHTML = strErrHTML + killChars(strError, true) + "</div></li>";
+                }
+                else {
+                    strErrHTML = strErrHTML + "<li class='inlineError clearfix'><div class='span5'>";
+                    strErrHTML = strErrHTML + killChars(strError, true) + "</div></li>";
+                }
+            }
+        }
+    }
+    strErrHTML = strErrHTML + "</ul>";
+    gErrString = "";
+    return strErrHTML;
+}
+
+function fl_displayErrorsInlineNoErrNums(strSystemMessage,strSource)
+{
+    var Now = new Date();
+    var strUrl;
+
+    var aErrors = gErrString.split("|");
+    var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;  
+	strErrHTML = "<ul>";
+    var sColor = "";
+    for (i = 0; i <= aErrors.length - 1; i++) 
+	{
+        if (aErrors[i] != "") 
+		{
+            arrElements = aErrors[i].split("^");
+
+            lngPropertyCnt = arrElements.length - 1;
+			
+            if (lngPropertyCnt > 0) 
+			{
+                strError = arrElements[lngPropertyCnt];
+                 if(strSource != "login")
+				 {
+					strErrNum = arrElements[lngPropertyCnt - 1];
+				 }
+            } 
+			else 
+			{
+                strError = arrElements[0];
+                if(strSource != "login")
+				 {
+					strErrNum = "";
+				 }
+            }
+
+            if (strError != "") 
+			{
+                strErrHTML = strErrHTML +  "<li class='inlineError clearfix'>"
+					if(strSource != "login")
+					{
+						strErrHTML = strErrHTML + "<div class='span4'>" + killChars(strErrNum, true) + "</div>" 
+				    }
+					if(strSource != "login")
+					{
+					    strErrHTML = strErrHTML + "<div class='span7'>" + strError + "</div></li>"
+					}
+					else
+					{
+					    strErrHTML = strErrHTML + "<div class='span12'>" + strError + "</div></li>"
+					}
+			}
+
+               
+        }
+    }
+    strErrHTML = strErrHTML + "</ul>";
+    if ((strErrHTML != "") && (aErrors.length >= 2)) {       
+
+        if(strSource=="login")
+		{
+			document.getElementById("divLoginErrors").innerHTML =  strErrHTML ;  
+			document.getElementById("divLoginErrors").style.display = "block";  	
+		}
+		else
+		{
+			document.getElementById("divCreateErrors").innerHTML =  strErrHTML ;  
+		    document.getElementById("divCreateErrors").style.display = "block";  
+		}
+    }
+
+    gErrString = "";
+}
+function displayErrorsInlineNoErrNums(strSystemMessage)
+{
+    var Now = new Date();
+    var strUrl;
+
+    var aErrors = gErrString.split("|");
+    var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+	
+    if (aErrors.length >= 2)
+    {
+        strErrHTML = "<table cellspacing='0' cellpadding='3' border='2' width='95%' align='center' bordercolor='black'><tr>" +
+			"<td bgcolor='#ffffff' align='left' width='100%' class='BasePageFont'><br><font color='red'><b>System Message:</b></font>&nbsp;&nbsp;"
+
+        if (strSystemMessage == "") {
+            strErrHTML = strErrHTML + "Please review the details presented below for more information. If required questions on this page are not complete, " +
+			"they will be identified in the list below. All other page information will still be saved."
+        }
+        else
+        {
+            strErrHTML = strErrHTML + strSystemMessage;
+        }
+
+        strErrHTML = strErrHTML +  "<div align='center'><img src='../images/common_images/dividing_line.gif' width='98%' height='5' alt=''><br><br>" +
+			"<table border=1 bordercolor='black' cellspacing='0' cellpadding='0' width='98%'><tr><td width=100%>" +
+			"<table border=0 cellspacing='5' cellpadding='0' width='100%'>"
+    }
+
+    var sColor = "";
+    for (i = 0; i <= aErrors.length - 1; i++) {
+        if (aErrors[i] != "") {
+            arrElements = aErrors[i].split("^");
+
+            lngPropertyCnt = arrElements.length - 1;
+
+            if (lngPropertyCnt > 0) {
+                strError = arrElements[lngPropertyCnt];
+                //strErrNum = arrElements[lngPropertyCnt - 1];
+            } else {
+                strError = arrElements[0];
+                //strErrNum = "";
+            }
+
+            if (strError != "") {
+                strErrHTML = strErrHTML + "<tr " + sColor + "align='center' valign='top'>" +					
+					"<td align='center' class='BaseTableFont' width='100%'>" + killChars(strError, true) + "</td>" +
+					"</tr>";
+
+                sColor = (sColor == "" ? "bgcolor='#CCCCCC' " : "");
+            }
+        }
+    }
+
+    if ((strErrHTML != "") && (aErrors.length >= 2)) {
+        strErrHTML = strErrHTML + "<tr><td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='30%' height='10' alt=''></td>" +
+			"<td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='70%' height='10' alt=''></td></tr>" +
+			"</table></td></tr></table><br></div></td></tr></table><br>";
+
+        divErrors.innerHTML = "<font color='#004731'>" + strErrHTML + "</font>";
+        divErrors.style.display = "block";       
+    }
+
+    gErrString = "";
+}
+
+function displayErrorsInlineNoErrNumsNoSystemMessage()
+{
+	var Now = new Date();
+	var strUrl;
+	
+	var aErrors = gErrString.split("|");
+	var i, arrElements, lngPropertyCnt, strError, strErrNum, strErrHTML;
+
+	if (aErrors.length >=2)
+	{
+		strErrHTML = "<table cellspacing='0' cellpadding='3' border='2' width='90%' align='center' bordercolor='black'><tr>" + 
+			"<td bgcolor='#ffffff' align='center' width='100%' class='BasePageFont'>" +
+			"<br>" +
+			"<table border=1 bordercolor='black' cellspacing='0' cellpadding='0' width='95%'><tr><td width=100%>" +
+			"<table border=0 cellspacing='5' cellpadding='0' width='100%'>"
+	}
+	
+	var sColor="";
+	for (i=0; i <= aErrors.length-1; i++)   
+	{
+		if (aErrors[i] != "")
+		{
+			arrElements = aErrors[i].split("^");
+												
+			lngPropertyCnt = arrElements.length -1;
+
+			if (lngPropertyCnt > 0)
+			{
+				strError = arrElements[lngPropertyCnt];
+				strErrNum = arrElements[lngPropertyCnt - 1];
+			}else
+			{
+				strError = arrElements[0];
+				strErrNum = "";
+			}
+			
+			if (strError != "")
+			{
+				strErrHTML = strErrHTML + "<tr " + sColor + "align='left' valign='top'>" + 
+					"<td class='BaseTableFont' width='30%'></td>" + 
+					"<td class='BaseTableFont' width='70%'>"  +  killChars(strError, true) + "</td>" + 
+					"</tr>";
+				
+				sColor = (sColor == "" ? "bgcolor='#CCCCCC' " : "");
+			}
+		}
+	}
+
+	if ((strErrHTML != "") && (aErrors.length >=2))
+	{
+		strErrHTML = strErrHTML + "<tr>" +
+			"<td align='left' valign='top'><img src='../images/common_images/spacer.gif' width='70%' height='10' alt=''></td></tr>" +
+			"</table></td></tr></table><br/></div></td></tr></table>";
+		
+		divAyMsg.innerHTML = "<font color='#004731'>" + strErrHTML + "</font>";
+		divAyMsg.style.display = "block";
+		//ACE # 86
+		//window.location.href = "#top";
+	}
+
+	gErrString = "";
+}
+
+function displayErrorsModal(strHeader, strMessage) {
+    $('#errHeader').html(strHeader);
+    $('#errBody').html(strMessage);
+    $('#errDlg').modal('show');
+}
+function displayModalDlg(strHeader, strMessage) {
+    $('#modalheader').html(strHeader);
+    $('#modalbody').html(strMessage);
+    $('#dialog').modal('show');
+}
+
+function showDocToolTip(qid,intMaxFileSize)
+{
+    if(document.getElementById("MaxUploadFileSize") !=null)
+    {
+        if(document.getElementById("MaxUploadFileSize").value != "")
+            intMaxFileSize = document.getElementById("MaxUploadFileSize").value;
+    }
+    var strMsg = "The file cannot exceed " + intMaxFileSize.toString() + " KB in size and should be in .doc, .wpd, .rtf, .xls, .pdf, .docx, .xlsx, .txt, .jpg, .pict, .gif, .bmp, .tif or .png format.<i> For Macintosh users , please note that the filename must include the appropriate three- or four-letter extension.</i> <b>Do not attempt to upload a document that is password-protected or that contains macros as it would cause the process to fail.</b>"
+    showToolTip(qid,strMsg);
+}
+      
+
+function showMediaToolTip(qid,strMediaFileTypes,intMediaFileSize)
+{
+    if(document.getElementById("MediaSupportedFileTypes") !=null)
+    {
+        if(document.getElementById("MediaSupportedFileTypes").value != "")
+            strMediaFileTypes = document.getElementById("MediaSupportedFileTypes").value;
+    }
+    if(document.getElementById("MediaUploadFileSize") !=null)
+    {
+        if(document.getElementById("MediaUploadFileSize").value != "")
+            intMediaFileSize = document.getElementById("MediaUploadFileSize").value;
+    }
+    var strMsg = "The file cannot exceed " + intMediaFileSize.toString() + " KB in size and should be in " + strMediaFileTypes + " format. <i>For Macintosh users, please note that the filename must include the appropriate three- or four-letter extension.</i><b>Do not attempt to upload a document that is password-protected or that contains macros as it would cause the process to fail.</b>";
+    showToolTip(qid,strMsg);
+}
+function showToolTip(qid,strMsg)
+{
+     var sObj;
+     if (window.jQuery) {  
+        var bootstrap_enabled = (typeof $().tooltip == 'function');
+        if(bootstrap_enabled)
+        {
+            sObj = "#"+qid+ "tooltip";
+            showToolTipFL(sObj,strMsg);
+        }
+        else
+        {
+            sObj = qid+ "tooltip";
+            showToolTipDiv(sObj,strMsg);
+        }
+         
+     }
+     else
+     {
+        sObj = qid+ "tooltip";
+        showToolTipDiv(sObj,strMsg);
+     }
+    
+}
+
+function showToolTipDiv(sObj,strMsg)
+{  
+    var obj = document.getElementById(sObj);
+    var divIdName =  sObj+'Div';
+    obj.onmouseout = function() { 
+       if(document.getElementById(divIdName) !=null)
+        {
+            document.getElementById(divIdName).style.display = 'none';
+        }
+    };
+    if(document.getElementById(divIdName) ==null)
+    {
+          var newdiv = document.createElement('div');
+          newdiv.setAttribute('id',divIdName);
+          newdiv.innerHTML = strMsg;
+          obj.parentNode.appendChild(newdiv);
+          document.getElementById(divIdName).className = 'divtooltip-hover';
+          document.getElementById(divIdName).style.position= 'absolute';
+          document.getElementById(divIdName).style.display = 'inline';
+         
+    }
+    else
+    {
+        document.getElementById(divIdName).style.position= 'absolute';
+        document.getElementById(divIdName).style.display = 'inline';
+    }
+}
+function showToolTipFL(sObj,strMsg)
+{
+	
+	$(sObj).attr('data-toggle', 'tooltip');
+	$(sObj).attr('title', '');
+	$(sObj).attr('data-original-title', strMsg);
+
+	$(sObj).tooltip({
+			'placement': 'bottom'
+	 }).tooltip('show');
+}
+
+
+// Pramod - 04/19/2013 : Now that WebCenter and MaintenanceCenter passwords are changed to 8 to 30 characters in length, this
+// function could be used for all types of users
+// Use this when the form has two password fields (Password and ConPassword) - if the form has a field for Existing password, use
+// initializeJQueryChangePasswordValidation
+function initializeJQueryResetPasswordValidation(formName)
+{
+	var upperCase= new RegExp("[A-Z]");
+	var lowerCase= new RegExp('[a-z]');
+	var numbers = new RegExp("[0-9]");
+	var specialChars = new RegExp("[^ A-Za-z0-9]");
+	
+	var inValidChar = new RegExp("[\\s]");
+
+	jQuery.validator.addMethod("alphaNumericAndSpecialCharacter", function(value, element) {
+		return this.optional(element) || ( (upperCase.test(value)) && (lowerCase.test(value)) && (numbers.test(value)) && (specialChars.test(value)) );
+	}, "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.");
+
+	jQuery.validator.addMethod("alphaNumericSpecialCharacterOnly", function(value, element) {
+		return this.optional(element) || (!inValidChar.test(value));
+	}, "Password cannot contain space character");
+
+	// validate Main form on keyup and submit
+	$(formName).validate({
+		rules: {
+		   Password: {
+				required: true,
+				minlength: 8,
+				maxlength: 30,
+				alphaNumericAndSpecialCharacter: true,
+				alphaNumericSpecialCharacterOnly: true
+			},
+			ConPassword: {
+				required: true,
+				minlength: 8,
+				maxlength: 30,
+				alphaNumericAndSpecialCharacter: true,
+				alphaNumericSpecialCharacterOnly: true,
+				equalTo: "#Password"
+			}
+		},
+		messages: {
+			Password: {
+				required: "Please enter a Password.",
+				minlength: "Password must be between 8 and 30 characters.",
+				maxlength: "Password must be between 8 and 30 characters.",
+				alphaNumericAndSpecialCharacter: "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.",
+				alphaNumericSpecialCharacterOnly: "Password cannot contain space character."
+			},
+			ConPassword: {
+				required: "Please enter a confirm Password.",
+				minlength: "Password must be between 8 and 30 characters.",
+				maxlength: "Password must be between 8 and 30 characters.",
+				alphaNumericAndSpecialCharacter: "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.",
+				alphaNumericSpecialCharacterOnly: "Password cannot contain space character.",
+				equalTo: "Your Password and Confirm Password do not match."
+			}
+		}
+	});	
+}
+
+// Pramod - 04/19/2013 : Now that WebCenter and MaintenanceCenter passwords are changed to 8 to 30 characters in length, this
+// function could be used for all types of users
+// Use this when the form has three password fields (oldPassword, newPassword and conNewPassword)
+// if the form has only only two fields for Password and ConPassword, use initializeJQueryResetPasswordValidation
+function initializeJQueryChangePasswordValidation(formName)
+{
+	var upperCase= new RegExp("[A-Z]");
+	var lowerCase= new RegExp('[a-z]');
+	var numbers = new RegExp("[0-9]");
+	var specialChars = new RegExp("[^ A-Za-z0-9]");
+	
+	var inValidChar = new RegExp("[\\s]");
+
+	jQuery.validator.addMethod("alphaNumericAndSpecialCharacter", function(value, element) {
+		return this.optional(element) || ( (upperCase.test(value)) && (lowerCase.test(value)) && (numbers.test(value)) && (specialChars.test(value)) );
+	}, "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.");
+
+	jQuery.validator.addMethod("alphaNumericSpecialCharacterOnly", function(value, element) {
+		return this.optional(element) || (!inValidChar.test(value));
+	}, "Password cannot contain space character");
+
+	// validate Main form on keyup and submit
+	$(formName).validate({
+		rules: {
+			oldPassword: {
+				required: true
+			},
+			newPassword: {
+				required: true,
+				minlength: 8,
+				maxlength: 30,
+				alphaNumericAndSpecialCharacter: true,
+				alphaNumericSpecialCharacterOnly: true
+			},
+			conNewPassword: {
+				required: true,
+				minlength: 8,
+				maxlength: 30,
+				alphaNumericAndSpecialCharacter: true,
+				alphaNumericSpecialCharacterOnly: true,
+				equalTo: "#newPassword"
+			}
+		},
+		messages: {
+			oldPassword: {
+				required: "Please enter current Password."
+			},
+			newPassword: {
+				required: "Please enter a Password.",
+				minlength: "Password must be between 8 and 30 characters.",
+				maxlength: "Password must be between 8 and 30 characters.",
+				alphaNumericAndSpecialCharacter: "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.",
+				alphaNumericSpecialCharacterOnly: "Password cannot contain space character."
+			},
+			conNewPassword: {
+				required: "Please enter a confirm Password.",
+				minlength: "Password must be between 8 and 30 characters.",
+				maxlength: "Password must be between 8 and 30 characters.",
+				alphaNumericAndSpecialCharacter: "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and one of the valid special characters.",
+				alphaNumericSpecialCharacterOnly: "Password cannot contain space character.",
+				equalTo: "Your Password and Confirm Password do not match."
+			}
+		}
+	});	
+}
+function validateFileName(strFileName,strLabel)
+{
+   
+    var strInvalid = /[\\/:*?"<>|]+/g;
+    if (strFileName.search(strInvalid)==-1) 
+    {
+        return true;
+    }
+    else
+    {
+       addError("Filename cannot contain any of the following characters: &#92; / : * ? &quot; &lt; &gt; &#124; ", strLabel,"");
+       return false;
+    }
+      
+}
+function CopyToClipBoard(strText) 
+{
+    if(window.clipboardData) {
+        window.clipboardData.setData('text',strText);
+        alert("Copied to clipboard." );
+    }
+    else
+    {
+        window.prompt("Press Ctrl+C to copy to clipboard.", strText);
+    }
+}

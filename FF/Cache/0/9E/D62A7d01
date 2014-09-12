@@ -1,0 +1,814 @@
+
+<script language="JavaScript" src="../common/ValidationConsts.js"></script>
+<script language="JavaScript" src="../common/Validation.js"></script>
+<script language="JavaScript" src="../common/Common.js"></script>
+
+<script language="javascript">
+
+function logout()
+{    
+    document.location.href = "../common/AdminSecurity.asp?exit=1";
+}
+function sessionExpireLogout()
+{
+    if (top.location != location) 
+    { 
+         top.location.href =  "../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+    }
+    else
+    {
+	    document.location.href ="../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+	}
+}
+</script>
+
+
+<script language=javascript>
+    function SetCustomLocale()
+    {
+         return '';
+    }
+</script>
+
+<html>
+	<head>
+		<title>ApplyYourself Webcenter</title>
+		<style>
+	#calendar {position:absolute; top:50px; left:50px; visibility:hidden; background-color:white;}
+	TD.cal { font-family:arial; font-size: 8pt; }
+	TD.calmonth { font-family:arial; font-size: 8pt; text-align: right;}
+	TD.caltoday { font-family:arial; font-size: 8pt; text-align: right; color: white; background-color:#C0C0C0; border-width:1; border-type:solid; border-color:#800000; }
+	INPUT.caltoday { font-family:arial; font-size: 8pt; width:47px; height: 20px; }
+	A.cal { text-decoration:none; color:#000000; }
+	A.calthismonth { text-decoration:none; color:#000000; }
+	A.calothermonth { text-decoration:none; color:#808080; }
+</style>
+<!-- Load the calendar popup file -->
+        <script language="JavaScript" SRC="../common/calendarpopup.js"></script>
+
+<script language="javascript" src="../common/common.js"></script>
+<script language="javascript">
+	function toggleView(itemX)
+	{	
+		
+		if(itemX.style.display == "none" || itemX.style.display == "")
+		{
+		    var blnReturn = checkIE7orOlderVersion();
+
+		    if (blnReturn)
+		    {
+		        itemX.style.display = "block";       
+		    }
+		    else
+		    {
+		        itemX.style.display = "table-row";
+		    }			
+		}
+		else
+		{
+			for (var x=1; x<40; x++)
+			    itemX.style.display="none";			
+		}
+}
+
+</script>
+
+<script language="JavaScript">
+	<!--
+               
+		function loader()
+		{	
+			var strConfirmMsg = 'Applicant was successfully unsubmitted';
+
+			if (strConfirmMsg != '')
+				{
+				setMessage(strConfirmMsg);
+				}
+
+			MM_preloadImages('../Images/common_images/sub_choice_o.gif')			
+			gErrString = "";
+			if (gErrString != "")
+			{
+				displayErrors();
+				gErrString = "";
+			}
+		}			
+		function EditInquiry(ID, InqPackageID)
+		{
+			window.open("../AYManageInquires/AYManage_Inquiry_ViewEdit.asp?d=" + getTimeStamp() + "&PackageAnswerID=" + ID + "&InqPackageID=" + InqPackageID, "ManageInquiryEdit", "scrollbars=yes,resizable=yes,status=no,menubar=no,toolbar=no,width=640,height=400,left=50");
+			
+		}
+				
+		function openWindow (strURL)
+		{
+			var strSeparator;
+			if (strURL.indexOf("?") == -1)
+			{
+				strSeparator = "?";
+			}
+			else
+			{
+				strSeparator = "&";
+			}
+			window.open(strURL + strSeparator + "d=" + getTimeStamp(), "AppSummary", "scrollbars=yes,resizable=yes,status=no,menubar=no,toolbar=no,width=700,height=400,left=50");
+		}
+
+		function openPrintApplication (strURL)
+		{
+			window.open(strURL + "&d=" + getTimeStamp(), "AppSummary", "directories=no,menubar=no,status=no,toolbar=no,resizable=yes,scrollbars=yes,location=no,titlebar=no ,width=700, height=500");
+		}				
+				
+		function goDisplaySection(formid,sectionid,sectionname)
+		{
+			var lngpackageanswerid;
+			var lngpackageid;
+			lngpackageanswerid = document.formMain.SelectedIDs.value;
+			lngpackageid = 419;
+			openWindow ("../AYApplicantSummary/ViewApplicantAnswers.asp?FormID=" + formid + "&SectionID=" + sectionid + "&SectionName=" + sectionname + "&PackageAnswerID=" + lngpackageanswerid + "&ApplicantClientID=1947431");
+		}
+
+		
+
+		function gotoApplicantionFee()
+		{
+			openWindow ("ApplicantAppFeeNew.asp?");
+		}
+
+		function quickView () 
+		{
+			openWindow ("../AYQuickView/QuickView.asp?");
+		}
+
+		function print () {
+			openPrintApplication ("../AYApplicantMain/Application_1947431.pdf?paid=2077364&ct=PDF");
+		}
+
+		function Print_Recommendations()
+		{
+			openPrintApplication("../AYApplicantSummary/Recommendation_1947431.pdf?paid=2077364&ct=PDF");
+		}
+
+		function viewGroups () {
+			openWindow ("../AYApplicantSummary/ViewGroups.asp?");
+		}
+
+		function viewRcmdProvider(rmcdProviderID)
+		{	
+			openWindow ("../AYApplicantSummary/ViewRcmdProvider.asp?RcmdProviderID=" + encodeURIComponent(rmcdProviderID));
+		}
+		function renotify(rmcdProviderID)
+		{
+			var strAltName = "Recommendation-Shiva";
+			var clientID = 111;
+			var applicantPackageAnswerID = 2077364;
+			var applicantProfileID = 1947723;
+			var applicantClientID = 1947431;
+			addHiddenElement(document.formMain,"RcmdProviderProfileID",rmcdProviderID);
+			addHiddenElement(document.formMain,"ClientID",clientID);
+			addHiddenElement(document.formMain,"ApplicantProfileID",applicantProfileID);
+			addHiddenElement(document.formMain,"ApplicantClientID",applicantClientID);
+			addHiddenElement(document.formMain,"AppPackageAnsID",applicantPackageAnswerID);
+			
+			if (confirm("This will resend the notification email to the " + strAltName + " provider.  Please confirm that you wish to proceed by clicking on the OK button below.") == true)
+			{
+				document.formMain.action = "../AYAdmin/Recommendation_Renotify.asp";
+				document.formMain.submit();
+			}
+		}
+		function addHiddenElement(objParentElement, strName, strValue)
+		{
+			var objHidden = document.getElementsByName(strName);
+			if (objHidden == undefined || objHidden.length == 0)
+			{
+				objParentElement.innerHTML = objParentElement.innerHTML + "<input type='hidden' name='" + strName + "' value='" + strValue + "'>";
+			}
+			else
+			{
+				objHidden.value =  strValue ;
+			}
+		}
+		function UpdateExportDate()
+		{
+			var msg = "Do you want to mark this applicant as not exported?";
+			if (confirm(msg))
+			{
+				document.formMain.action = "../AYApplicantSummary/UpdateExport.asp?d=" + getTimeStamp();
+				document.formMain.submit();	
+			}	
+		}
+
+		function UpdateSubmittedDate()
+		{
+			var msg = "Do you want to mark this applicant as not submitted?";
+			if (confirm(msg))
+			{
+				document.formMain.action = "../AYApplicantSummary/UpdateSubmitted.asp?d=" + getTimeStamp();
+				document.formMain.submit();	
+			}	
+		}
+		
+		function goUpdateAppProfile(strConnectID,strAuthScheme)
+		{
+			if (strConnectID == undefined)
+			{
+				strConnectID = ''
+			}
+			if (strAuthScheme == undefined)
+			{
+				strAuthScheme = ''
+			}
+			openWindow("../AYAdmin/AY_UpdateAppProfile.asp?connectID=" + strConnectID + "&AuthScheme=" + strAuthScheme);		
+		}
+
+		function viewSuppDocs(SupportingDocStatusID, SupportingDocName)
+		{	
+			openWindow ("ManageSupportingDocs.asp?SuppDocStatusID=" + SupportingDocStatusID + "&SuppDocName=" + escape(SupportingDocName));
+		}
+		
+		function viewSuppDocsInProgess(SupportingDocStatusID, SupportingDocName, blnViewPreSubmit)
+		{	
+			var lngpackageanswerid;
+			lngpackageanswerid = document.formMain.SelectedIDs.value;	
+			openWindow ("ManageSupportingDocs.asp?SuppDocStatusID=" + SupportingDocStatusID + "&PackageAnswerID=" + lngpackageanswerid + "&SuppDocName=" + escape(SupportingDocName) + "&ViewPreSubmit=" + blnViewPreSubmit);	
+		}
+
+
+		function viewTranscript(TranscriptID)
+		{	
+			var lngpackageanswerid;
+			lngpackageanswerid = document.formMain.SelectedIDs.value;	
+			openWindow ("../AYManageTranscripts/ManageTranscripts.asp?TranscriptID=" + TranscriptID);
+		}
+
+		function viewComments() 
+		{
+			openWindow ("../AYApplicantSummary/ViewComments.asp?");	
+		}
+
+		function viewHistory() 
+		{
+			openWindow ("../AYApplicantSummary/ViewHistory.asp?");
+		}
+
+		function gotoProcess()
+		{	
+			var lngactntypeid;
+			lngactntypeid = document.formMain.ActionTypeID.value;		
+			if (lngactntypeid != 10 && lngactntypeid !="" ) {
+				document.formMain.action = "../AYProcessSearchResults/process_search_results_action.asp?d=" + getTimeStamp();
+				document.formMain.submit();
+				}
+			else
+			{
+				if (lngactntypeid == 10) {		
+						var strMessage;
+						var blnDeleteResult;				
+						strMessage = gErrSingleDeletePreConfirmMsg
+						blnDeleteResult = confirm(strMessage);				
+						if (blnDeleteResult)
+						{
+							document.formMain.action = "../AYProcessSearchResults/process_search_results_action.asp?d=" + getTimeStamp();
+							document.formMain.submit();
+						}		
+				}
+				else {
+				gErrString = "Please select an action."
+				displayErrors();
+				gErrString = "";
+				}
+			}
+			
+		}
+		
+		function ChangeSubscriptionStatus(blnSubscribe, blnInProgress, blnViewPreSubmit)
+		{
+			var blnConfirm;
+			var strStatus, strMessage, strValue;
+			
+			if (blnSubscribe)
+			{
+				strStatus = "Subscribed";
+				strValue = "yes";
+			}
+			else
+			{
+				strStatus = "UnSubscribed";
+				strValue = "no";
+			}
+			
+			strMessage = "Please verify that you would like to change this applicant's subscription status by clicking on the OK button below.";
+			
+			blnConfirm = confirm(strMessage);
+			
+			if (blnConfirm)
+			{
+				document.formMain.action = "../AYEmailSubscription/EmailSubscriptionStatus.asp?status=" + strValue + "&InqPack=no&ViewPreSubmit=" + blnViewPreSubmit + "&InProgressApps=" + blnInProgress;
+				document.formMain.submit();
+			}
+		}
+		function ChangeWaiveStatus(strRecAltName)
+		{
+			var blnConfirm;
+			var strMessage;			
+			
+			strMessage = "Please verify that you would like to change this applicant's " + strRecAltName + " waived status by clicking on the OK button below.";
+			
+			blnConfirm = confirm(strMessage);
+			
+			if (blnConfirm)
+			{
+				document.formMain.action = "../AYApplicantSummary/UpdateWaived.asp?d=" + getTimeStamp();
+				document.formMain.submit();
+			}
+		}
+		function viewTestScores()
+		{
+			openWindow ("../AYManageTestScores/ManageTestScoresListSummary.asp?");
+		}
+
+		function viewTestScore(TestStatusID)
+		{
+			openWindow("../AYManageTestScores/ManageTestScoresAddEdit.asp?TestStatusID=" + TestStatusID);
+		}
+
+		function AddTestScore()
+		{
+			openWindow("../AYManageTestScores/ManageTestScoresAddEdit.asp?");
+		}
+
+		function Print_Decision(lngDecisionNum)
+		{
+			var aw, yc, ah, screen;
+			var width=770;
+			var height=550;
+			var xc=0;
+			var strDecisionLabel = "";
+			var lngpackageanswerid = 2077364;
+			var lngpackageid = 419;
+			if(window.screen)
+			{
+				screen=window.screen;
+				var ah = screen.availHeight - 30;
+				var aw = screen.availWidth - 10;
+				var xc = (aw - width) / 2;
+				var yc = (ah - height) / 2;
+			}
+			window.open("ApplicantDecisionPreview.asp?DecisionName=" + encodeURIComponent(strDecisionLabel) + "&DecisionNum=" + lngDecisionNum ,"ViewDecision","top=" + yc + ",left=" + xc + ",center=1,width=770,height=550,help=0,titlebar=0,resizable=1,scrollbars=1");
+		}
+
+		function AddRcmdProvider()
+		{
+			openWindow("../AYApplicantSummary/AddRcmdProvider.asp?");
+		}
+				
+		function goDisplayEnrollSection(enrollpackansid, enrollpackid, actionType, lngAppPackAnsId, lngAppClientId)
+		{
+		    if (actionType == "Add")
+		    {
+		        openWindow("../AYManageEnrollment/AYManageEnrollment.asp?" + "PackageId=" + enrollpackid + "&Mode=AppSummary" + "&AppClientId=" + lngAppClientId + "&AppPackageAnswerID=" + lngAppPackAnsId + "&d=" + getTimeStamp());	
+		    }
+			else if ((actionType = "Update") || (actionType = "Submit"))
+			{
+			    openWindow("../AYManageEnrollment/AYManageEnrollment.asp?d=" + getTimeStamp() + "&PAID=" + enrollpackansid + "&PackageId=" + enrollpackid + "&mode=EnrollAppSummary");
+	        }			
+		}
+		
+		function ViewDocSimiReport(reportId)
+		{
+			openWindow ("ViewDocumentSimilarityReport.asp?reportId=" + reportId);			
+        }
+		
+		
+	//-->
+</script>
+		<link rel="stylesheet" href="../common/stylesheet.css">
+	</head>
+	<body onLoad="loader();" bgcolor="#FFFFFF" leftmargin="10" marginwidth="10" topmargin="10" marginheight="10">
+		
+
+<form method="post" action="" name="formMain">
+	<input type="hidden" name="SelectedIDs" value="2077364"> <input type="hidden" name="UpdatedBy" value="7070">
+	<input type="hidden" name="Source" value="AppSummary"> <input type="hidden" name="SubmitFrom" value="../AYApplicantSummary/ApplicantSummary.asp">
+	<input type="hidden" name="SubmittedApps" value="Yes"> <input type="hidden" name="NoRecords" value="1">
+	<input type="hidden" name="FromViewPreSubmitPage" value="yes" ID=""> <input type="hidden" name="ViewPreSubmit" value="True" ID="Hidden1">
+	<input type="hidden" name="AYFormID" value="F2F9FDE131680A369F2A02341E66BA5C22548605" ID="Hidden3"> 
+	<div align="left" id="divAyConfirmation" style="display:none;width:580px;" class="AYConfirmationText"></div>
+	<table width="680" border="0" cellspacing="0" cellpadding="0">
+		<tr align="left" class="FormText">
+			<td valign="middle" colspan="2"><DIV ID="AYInstructions" style="display:none" class="FormText">The 
+					summary screen is your overall picture of an applicant. Because this applicant 
+					is still in-progress, you are only able to access a subset of his/her 
+					information.<br>
+					<img src="../images/common_images/dividing_line.gif" width="679" height="5"><br>
+					<br>
+				</DIV>
+				<font style="font-size: 8pt; font-family: Arial,Sans-Serif;">Application System :: 
+					Applicant Summary </font>
+			</td>
+		</tr>
+		<tr align="left" class="FormText">
+			<td valign="middle" bgcolor="#CCCCCC">&nbsp;<img src="../Images/common_images/question_button.gif" width="11" height="12" align="absmiddle"
+					border="0"> <A HREF="javascript:show('AYInstructions')"><font class="FormText" color="#000000">
+						show</font></A> | <A HREF="javascript:hide('AYInstructions')"><font class="FormText" color="#000000">
+						hide</font></A> <font class="FormText" color="#000000">instructions</font>
+			</td>
+			<td align="right" valign="middle" bgcolor="#CCCCCC">
+				<a href="javascript:self.close();"><img src="../Images/common_images/admin_close_window_large.gif" width="100" height="11"
+						border="0"></a>&nbsp;</td>
+		</tr>
+		<tr align="left">
+			<td valign="middle" colspan="2"><img src="../images/common_images/dividing_line.gif" width="679" height="5"></td>
+		</tr>
+		<tr>
+			<td colspan="2"><img src="../Images/common_images/spacer.gif" height="10"></td>
+		</tr>
+		<tr>
+			<td valign="top" width="420">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr align="left" valign="top" bgcolor="#000000">
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+					<tr align="left" valign="top">
+						<td bgcolor="#004731" width="2">
+							<img src="../Images/common_images/spacer.gif" width="2" height="2">
+						</td>
+						<td bgcolor="#CCCCCC" align="center">
+							<table width="100%" border="0" cellspacing="2" cellpadding="2" align="center">
+								<tr align="center" valign="middle">
+									<td colspan="4" class="FormHeading" bgcolor="#004731">
+										<font color="#FFFFFF">
+											
+											&nbsp;TESTUSER11021410505562729&nbsp;&nbsp;Testuser1102
+											&nbsp;&nbsp;
+											
+										</font>
+										
+									</td>
+								</tr>
+								
+								<tr align="left" valign="top" bgcolor="#FFFFFF">
+									<td colspan="2" rowspan="5" width="50%" class="FormText">
+										
+										<br>
+										
+										&nbsp;&nbsp;<br>
+										
+										&nbsp;
+									</td>
+									<td class="FormText" align="left" width="50%" colspan="2">&nbsp;</td>
+								</tr>
+								<tr bgcolor="#FFFFFF">
+									<td class="FormText" align="left" width="50%" colspan="2">&nbsp;</td>
+								</tr>
+								<tr bgcolor="#FFFFFF">
+									<td class="FormText" align="left" width="50%" colspan="2">&nbsp;</td>
+								</tr>
+								<tr bgcolor="#FFFFFF">									
+									<td class="FormText" align="left" width="50%" colspan="2"><i>Financial Aid: </i>&nbsp;</td>																
+								</tr>
+								<tr bgcolor="#FFFFFF">
+									<td class="FormText" align="left" width="50%" colspan="2"><i>Applicant ID:</i>
+										1947431
+									</td>
+								</tr>
+								<tr bgcolor="#FFFFFF">
+									<td align="left" class="FormText">
+										<i>Citizenship:</i>
+									</td>
+									<td align="left" class="FormText" colspan="3">&nbsp;</td>
+								</tr>
+								<tr align="left" valign="middle" bgcolor="#FFFFFF">
+									<td class="FormText" width="17%" valign="top"><i>Phone:</i></td>
+									<td class="FormText" align="left" width="33%"></td>
+									<td class="FormText" width="5%" valign="top"><i>Fax:</i></td>
+									<td class="FormText" align="left" width="45%" valign="top"></td>
+								</tr>
+								
+								<tr align="left" valign="middle">
+									<td valign="top" class="FormText" bgcolor="#FFFFFF" width="17%"><i>Email:</i></td>
+									<td valign="top" colspan="3" class="FormText" bgcolor="#FFFFFF">
+										<a href="mailto:emtqaaccount@hobsons.com" class="2">
+											emtqaaccount@hobsons.com
+										</a>&nbsp;
+										<br>
+										Subscription Status:
+										<a href="javascript:ChangeSubscriptionStatus(false, true, true);" class="2">Subscribed</a>
+									</td>
+								</tr>
+								<tr align="left" valign="middle" bgcolor="#FFFFFF">
+									<td class="FormText" width="17%"><i>DOB:</i></td>
+									<td class="FormText" width="33%">10/09/1989</td>									
+									<td class="FormText" width="5%"><i>SSN:</i>&nbsp;</td>
+									<td class="FormText" width="45%">&nbsp;</td>
+								</tr>
+								
+							</table>
+						</td>
+						<td bgcolor="#004731" width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+					<tr align="left" valign="top" bgcolor="#004731">
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+				</table>
+				<center>
+					<br>
+					
+						<a href="javascript:print();"><span class="DynamicImage">print application</span></a>
+					
+					<a href="javascript:viewHistory();"><span class="DynamicImage">view history</span></a>
+					 <a href="javascript:viewGroups();"><span class="DynamicImage">view groups</span></a>
+					<br>
+					<br>
+				</center>
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr align="left" valign="top" bgcolor="#004731">
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+					<tr align="left" valign="top">
+						<td bgcolor="#004731" width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td bgcolor="#CCCCCC" align="center">
+							<table width="100%" border="0" cellspacing="2" cellpadding="2" align="center">
+								<tr align="center" valign="middle">
+									<td colspan="2" class="FormHeading" bgcolor="#004731"><b><font color="#FFFFFF">Status 
+												Information </font></b>
+									</td>
+								</tr>
+								
+								<tr align="center" valign="middle">
+									<td class="FormText" align="left" valign="top" bgcolor="#FFFFFF" width="150">Application 
+										Source:</td>
+									<td class="FormText" bgcolor="#FFFFFF" align="left">Applicant</td>
+								</tr>
+								<tr align="center" valign="middle">
+									<td class="FormText" align="left" valign="top" bgcolor="#FFFFFF" width="150">Created 
+										| Last Accessed:</td>
+									<td class="FormText" bgcolor="#FFFFFF" align="left">
+										9/12/2014&nbsp;|&nbsp;9/12/2014
+									</td>
+								</tr>
+								<tr align="center" valign="middle">
+									<td class="FormText" align="left" valign="top" bgcolor="#FFFFFF" width="150">Last 
+										Updated Information:</td>
+									<td class="FormText" bgcolor="#FFFFFF" align="left">7070
+										on
+										9/12/2014 3:18:31 AM&nbsp;
+										EST</td>
+								</tr>
+								<tr align="center" valign="middle">
+									<td class="FormText" align="left" valign="top" bgcolor="#FFFFFF" width="150">Submitted:</td>
+									<td class="FormText" bgcolor="#FFFFFF" align="left">No</td>
+								</tr>
+								
+
+								<!-- Changes Made by Raj  06/23/2008 ACe #17 -->
+								<tr align="center" valign="middle">
+									<td class="FormText" align="left" valign="top" bgcolor="#FFFFFF" width="150">Status Publish Date:</td>
+									<td class="FormText" bgcolor="#FFFFFF" align="left">
+										
+											<input type="text" name="CompPubDate"  value="" size="20" class="FormFields" ID="Text1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											<a href="javascript:showCalendar('formMain', 'CompPubDate', 'CompPubDtCalPos')" name="CompPubDtCalPos">
+												<img src="../images/common_images/calendar.gif" border="0" width="34" height="21" align="absmiddle">
+											</a>
+		
+										
+									</td>
+								</tr>
+							</table>
+						</td>
+						<td bgcolor="#004731" width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+					<tr align="left" valign="top" bgcolor="#004731">
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+						<td width="2"><img src="../Images/common_images/spacer.gif" width="2" height="2"></td>
+					</tr>
+				</table>
+				<p align="center">&nbsp;</p>
+			</td>
+			<!--begin right hand column-->
+			<td align="right" valign="top">
+				<table width="250" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td rowspan="10" align="left" valign="top" bgcolor="#CCCCCC"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+						<td colspan="3" bgcolor="#CCCCCC">
+							<img src="../Images/common_images/spacer.gif" width="248" height="1"></td>
+						<td rowspan="10" align="left" valign="top" bgcolor="#CCCCCC"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+					</tr>
+					<tr>
+						<td colspan="3" bgcolor="#CCCCCC" align="center" valign="middle" class="FormHeading">Supporting 
+							Documents</td>
+					</tr>
+					<tr>
+						<td colspan="3"><img src="../Images/common_images/spacer.gif" width="248" height="5"></td>
+					</tr>
+					
+					<tr>
+						<td class="FormText" colspan="3">
+							<a href="Javascript:gotoApplicantionFee();" class="2"><img name="fee" border="0" src="../Images/common_images/sub_choice_n.gif" width="14"
+									height="7"> Application Fee </a>
+							<br>
+						</td>
+					</tr>
+					
+				<tr>
+				<td colspan="3">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td class="FormText">
+							<a href="javascript:toggleView(Rcmd1);" class="2"><img name="rec" border="0" src="../Images/common_images/sub_choice_n.gif" width="14"
+									height="7"> Recommendation-Shivas </a>
+							<br>
+							
+				</td>
+				</tr>
+				<tr id='Rcmd1' style='Display:None'>
+<td colspan='3'>
+<table border='0'  cellspacing='0' cellpadding='0'>
+<tr><td class='FormText' valign='middle'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img class="HelpBoxes" name="item1" border="0" src="../Images/common_images/not_started_icon.gIf" alt="not started online" width="16" height="16"><a class='2' href='javascript:viewRcmdProvider("TQLmK9XONB8%3D")';>Tester,TestRec</a>&nbsp;&nbsp;&nbsp;<a class='2' href='javascript:renotify("89837")';><img src="../Images/common_images/renotify_small_n.gif" alt="Renotify" border="0"></img></a></td></tr>
+<tr><td class='FormText'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a class='2' href='javascript:AddRcmdProvider()';>Add New Recommendation-Shiva</a></td></tr>
+</table></td></tr>
+							</table>
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="3"><table width="100%" border="0" cellspacing="0" cellpadding="0" ID="Table1">
+								<tr>
+									<td class="FormText">
+										<a href="javascript:toggleView(TestScores);" class="2"><img name="rec" border="0" src="../Images/common_images/sub_choice_n.gif" width="14"
+												height="7"> Standardized Test Scores </a>
+										<br>
+									</td>
+								</tr>
+								<tr id='TestScores' style='Display:None'>
+<td colspan='3'>
+<table border='0' cellspacing='0' cellpadding='0'>
+<tr><td class='FormText'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a class='2' href='javascript:AddTestScore()';>Add New TestScore</a></td></tr>
+</table></td></tr>
+							</table>
+						</td>
+					</tr>
+					
+					<tr>
+						<td colspan="3"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td class="FormText">
+										<a href="javascript:toggleView(Trans1);" class="2"><img name="rec" border="0" src="../Images/common_images/sub_choice_n.gif" width="14"
+												height="7"> Transcripts</a><br>
+									</td>
+								</tr>
+								<tr id='Trans1' style='Display:None'>
+<td colspan='3'>
+<table border='0' cellspacing='0' cellpadding='0'>
+<tr><td class='FormText'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a class='2' href='javascript:viewTranscript(0)';>Add New Transcript</a></td></tr>
+</table></td></tr>
+							</table>
+						</td>
+					</tr>
+					
+						<tr>
+							<td class="FormText" colspan="3">
+								<a href="javascript:toggleView(SuppDocs1);" class="2"><img name="test" border="0" src="../Images/common_images/sub_choice_n.gif" width="14"
+										height="7"> Other Supporting Documents </a>
+								<br>
+							</td>
+						</tr>
+						
+			<tr id='SuppDocs1' style='Display:None'>
+				<td colspan='3'>
+					<table border='0' cellspacing='0' cellpadding='0' ID="Table1">
+						
+						<tr>
+							<td class="FormText">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<img class='HelpBoxes' border='0' src='../Images/common_images/complete_icon_black.gif' alt='other supporting document received official or waived icon' width='16' height='16'>
+									<a class="2" href="javascript:viewSuppDocsInProgess(363,'Covering Letter','True');">
+									Covering Letter</a>
+									
+							</td>
+						</tr>
+						
+						<tr>
+							<td class='FormText'>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a class='2' href='javascript:viewSuppDocs(0, "");'>Add New Supporting Document</a>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			
+				<tr>
+					<td colspan="3"><img src="../Images/common_images/spacer.gif" width="248" height="5"></td>
+				</tr>
+				<tr bgcolor="#CCCCCC">
+					<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+					<td><img src="../Images/common_images/spacer.gif" width="248" height="1"></td>
+					<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+				</tr>
+				</table>
+				
+				<img src="../Images/common_images/spacer.gif" width="1" height="10"> 
+				<!--Lalitha's Code starts here-->
+				<!--Added by Lalitha on 9/6/01 to display the Application Completion Status -->
+				<table width="250" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td rowspan="6" align="left" valign="top" bgcolor="#CCCCCC"><img src="../Images/common_images/spacer.gif" width="1"></td>
+						<td colspan="3" bgcolor="#CCCCCC"><img src="../Images/common_images/spacer.gif" width="248" height="1"></td>
+						<td rowspan="6" align="left" valign="top" bgcolor="#CCCCCC"><img src="../Images/common_images/spacer.gif" width="1"></td>
+					</tr>
+					<tr>
+						<td colspan="3" bgcolor="#CCCCCC" align="center" valign="middle" class="FormHeading">Complete 
+							Status</td>
+					</tr>
+					<tr>
+						<td colspan="3"><img src="../Images/common_images/spacer.gif" width="248" height="5"></td>
+					</tr>
+					<tr>
+						<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+						<td class="FormText" align="left">
+							<input type="checkbox" name="chkAppFee" value="yes">&nbsp;Application Fee</input><br><input type="checkbox" name="chkTranscripts" value="yes">&nbsp;Transcripts</input><br>
+						</td>
+						<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+					</tr>
+					<tr>
+						<td colspan="3"><img src="../Images/common_images/spacer.gif" width="248" height="5"></td>
+					</tr>
+					<tr bgcolor="#CCCCCC">
+						<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+						<td colspan="3"><img src="../Images/common_images/spacer.gif" width="248" height="1"></td>
+						<td align="left" valign="top"><img src="../Images/common_images/spacer.gif" width="1" height="1"></td>
+					</tr>
+				</table>
+				<!--Display of the Application Completion Status-->
+				
+				<img src="../Images/common_images/spacer.gif" width="1" height="10">
+			</td>
+		</tr>
+		</td> </tr>
+		<tr>
+			<td align="left" valign="top" colspan="2"><img src="../images/common_images/dividing_line.gif" width="679" height="5"></td>
+		</tr>
+		<tr class="FormHeading">
+			<td align="center" valign="middle" bgcolor="#CCCCCC">&nbsp;</td>
+			<td align="right" valign="middle" bgcolor="#CCCCCC"><a href="javascript:UpdateAppInfo();"><img src="../images/common_images/admin_save_small_n.gif" width="46" height="11" border="0"></a>&nbsp;&nbsp;&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="420" height="10"></td>
+			<td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="260" height="10"></td>
+		</tr>
+	</table>
+	
+	
+	
+	<script language="javascript">
+	function UpdateAppInfo()
+	{
+		var packansid = "2077364";
+		var Mode = "";
+		var cbCount = 2;
+		var blnPreSubmit = "True";
+		
+		with (document.formMain)
+		{				
+			if (document.formMain.CompPubDate)
+			{
+				if (CompPubDate.value != "")
+				{
+					validateDates(CompPubDate.value, "Status Publish Date", "", "MM/DD/YYYY Or MM/DD/YYYY HH:MM:SS AM or PM", true);
+				}
+			}
+			
+			if (gErrString == "")
+			{
+				action = "ApplicantSummary_PreSub2_Action.asp?PackAnsID=" + packansid + "&Mode=" + Mode + "&CBCount=" + cbCount + "&ViewPreSubmit=" + blnPreSubmit;
+				submit();
+			}
+			else
+			{
+				displayErrors();
+				gErrString = "";
+			}
+		}
+	}
+	
+	
+	</script>
+	<input type="hidden" name="AppEmail" value="emtqaaccount@hobsons.com">
+</form>
+<div id="calendar"></div>
+	
+	</body>
+</html>

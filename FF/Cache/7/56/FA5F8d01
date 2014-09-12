@@ -1,0 +1,260 @@
+<div class="snippet_set" id="snippet_set" data-locale="en-US">
+  <style type="text/css">
+#snippetContainer div.snippet {
+  display: none;
+}
+
+#snippetContainer div.snippet img.icon {
+  margin: -0.75em 1em 0 0;
+  float: left;
+}
+
+  .snippet {
+    position: relative;
+  }
+
+  .snippet .icon {
+    position: absolute;
+    right: 400px;
+    top: 5px;
+  }
+
+  .snippet p {
+    display: table-cell;
+    height: 40px;
+    padding-left: 80px;
+    vertical-align: middle;
+    width: 400px;
+  }
+</style>      <div data-snippet-id="4544" data-weight="100" class="snippet-metadata"><div class="snippet">
+  <a href="https://addons.mozilla.org/firefox/addon/japanese-tattoo/?utm_source=snippet&amp;utm_medium=snippet&amp;utm_campaign=FreshInkTheme_en"><img class="icon" src="data:image/png;base64,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" /></a>
+  <p>Your browser should be anything but dull. <a href="https://addons.mozilla.org/firefox/addon/japanese-tattoo/?utm_source=snippet&amp;utm_medium=snippet&amp;utm_campaign=FreshInkTheme_en">Add some fresh ink to your theme</a>.</p>
+</div></div>
+      <div data-snippet-id="4511" data-weight="100" class="snippet-metadata" data-country="in"><div class="snippet">
+  <a href="http://www.mozilla.org/firefox/os/?utm_source=snippet&amp;utm_medium=snippet&amp;utm_campaign=FirefoxOS_Indiaen"><img class="icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAyCAYAAAAus5mQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpBNzg5OTE2NDI4MjA2ODExODcxRjkzRDA1NkY4QzJGNCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4Njg0MEI2QzExQkIxMUUzQUI5Q0Q1NEU5RTFEQ0RCNiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4Njg0MEI2QjExQkIxMUUzQUI5Q0Q1NEU5RTFEQ0RCNiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjU5MDVERTE4MTcyMDY4MTE5N0E1Qjc2NURBRTMwOTdDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkE3ODk5MTY0MjgyMDY4MTE4NzFGOTNEMDU2RjhDMkY0Ii8+IDwvcmRmOkRlc2NyaXB0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" /></a>
+  <p>Firefox OS is available in India! Be one of the first to have a Firefox OS smartphone! <a href="http://www.mozilla.org/firefox/os/?utm_source=snippet&amp;utm_medium=snippet&amp;utm_campaign=FirefoxOS_Indiaen">Here’s how to get one</a>.</p>
+</div></div>
+    <script type="text/javascript">
+//<![CDATA[
+/*!
+  * $script.js Async loader & dependency manager
+  * https://github.com/ded/script.js
+  * (c) Dustin Diaz, Jacob Thornton 2011
+  * License: MIT
+  */
+(function(a,b,c){typeof c["module"]!="undefined"&&c.module.exports?c.module.exports=b():typeof c["define"]!="undefined"&&c["define"]=="function"&&c.define.amd?define(a,b):c[a]=b()})("$script",function(){function p(a,b){for(var c=0,d=a.length;c<d;++c)if(!b(a[c]))return j;return 1}function q(a,b){p(a,function(a){return!b(a)})}function r(a,b,i){function o(a){return a.call?a():d[a]}function t(){if(!--n){d[m]=1,l&&l();for(var a in f)p(a.split("|"),o)&&!q(f[a],o)&&(f[a]=[])}}a=a[k]?a:[a];var j=b&&b.call,l=j?b:i,m=j?a.join(""):b,n=a.length;return setTimeout(function(){q(a,function(a){if(h[a])return m&&(e[m]=1),h[a]==2&&t();h[a]=1,m&&(e[m]=1),s(!c.test(a)&&g?g+a+".js":a,t)})},0),r}function s(c,d){var e=a.createElement("script"),f=j;e.onload=e.onerror=e[o]=function(){if(e[m]&&!/^c|loade/.test(e[m])||f)return;e.onload=e[o]=null,f=1,h[c]=2,d()},e.async=1,e.src=c,b.insertBefore(e,b.firstChild)}var a=document,b=a.getElementsByTagName("head")[0],c=/^https?:\/\//,d={},e={},f={},g,h={},i="string",j=!1,k="push",l="DOMContentLoaded",m="readyState",n="addEventListener",o="onreadystatechange";return!a[m]&&a[n]&&(a[n](l,function t(){a.removeEventListener(l,t,j),a[m]="complete"},j),a[m]="loading"),r.get=s,r.order=function(a,b,c){(function d(e){e=a.shift(),a.length?r(e,d):r(e,b,c)})()},r.path=function(a){g=a},r.ready=function(a,b,c){a=a[k]?a:[a];var e=[];return!q(a,function(a){d[a]||e[k](a)})&&p(a,function(a){return d[a]})?b():!function(a){f[a]=f[a]||[],f[a][k](b),c&&c(e)}(a.join("|")),r},r},this);
+
+(function(showDefaultSnippets) {
+    'use strict';
+
+    var SAMPLE_RATE = 0.1;
+    var STATS_URL = 'https://snippets-stats.mozilla.org/foo.html';
+    var GEO_URL = 'https://geo.mozilla.org/country.js';
+    var GEO_CACHE_DURATION = 1000 * 60 * 60 * 24 * 30; // 30 days
+
+    // showDefaultSnippets polyfill, available in about:home v4
+    if (typeof showDefaultSnippets !== 'function') {
+        showDefaultSnippets = function() {
+            localStorage.snippets = '';
+            showSnippets();
+        };
+    }
+
+    // gSnippetsMap polyfill, available in Firefox 22 and above.
+    var gSnippetsMap = null;
+    if (supportsLocalStorage()) {
+        // localStorage is available, so we wrap it with gSnippetsMap.
+        gSnippetsMap = {
+            set: function(key, value) {
+                localStorage[key] = value;
+            },
+            get: function(key) {
+                return localStorage[key];
+            }
+        };
+    } else {
+        // localStorage isn't available, use gSnippetsMap (backed by IndexedDB).
+        gSnippetsMap = window.gSnippetsMap;
+    }
+
+    var snippets = (document.getElementById('snippetContainer')
+                    .getElementsByClassName('snippet'));
+    var show_snippet = null;
+    if (snippets.length > 0) {
+        show_snippet = chooseSnippet(snippets);
+    }
+
+    if (show_snippet) {
+        show_snippet.style.display = 'block';
+
+        try {
+            activateSnippetsButtonClick(show_snippet);
+        } catch (err) {
+            // Do nothing, most likely a newer version of Firefox w/o
+            // activateSnippetsButtonClick
+        }
+
+        // Determine snippet ID.
+        var metaParent = show_snippet.parentNode;
+        while (metaParent && metaParent.classList &&
+               !metaParent.classList.contains('snippet-metadata')) {
+            metaParent = metaParent.parentNode;
+        }
+
+        var show_snippet_id = 'unknown';
+        if (metaParent) {
+            show_snippet_id = metaParent.dataset.snippetId || 'unknown';
+        }
+        send_impression(show_snippet_id);
+
+        // Trigger show_snippet event on snippet node.
+        var evt = document.createEvent('Event');
+        evt.initEvent('show_snippet', true, true);
+        show_snippet.dispatchEvent(evt);
+
+        // Add sample rate and snippet ID to currently displayed links.
+        var parameters = ('sample_rate=' + SAMPLE_RATE + '&snippet_name=' +
+                          show_snippet_id);
+        modifyLinks(show_snippet.getElementsByTagName('a'), parameters);
+    } else {
+        showDefaultSnippets();
+    }
+
+    // Fetch user country if we don't have it.
+    if (!haveUserCountry()) {
+        downloadUserCountry();
+    }
+
+            // Choose which snippet to display to the user based on various factors,
+    // such as which country they are in.
+    function chooseSnippet(snippets) {
+        // Build an object that maps countries to snippets.
+        var snippetsFor = {};
+
+        for (var k = 0; k < snippets.length; k++) {
+            var snippet = snippets[k];
+            var country = snippet.parentNode.dataset.country || 'none';
+
+            // Create a new entry in the object if it doesn't exist.
+            if (snippetsFor.hasOwnProperty(country)) {
+                snippetsFor[country].push(snippet);
+            } else {
+                snippetsFor[country] = [snippet];
+            }
+        }
+
+        // Choose a random snippet from the set of non-geolocated snippets,
+        // including snippets for the user's country if it is available.
+        var country = getUserCountry();
+        if (country && snippetsFor.hasOwnProperty(country)) {
+            snippets = snippetsFor[country];
+            if (snippetsFor.none) {
+                snippets = snippets.concat(snippetsFor.none);
+            }
+        } else {
+            snippets = snippetsFor.none;
+        }
+
+        if (snippets && snippets.length) {
+            var sum = 0;
+            for (var k = 0; k < snippets.length; k++) {
+                sum += parseInt(snippets[k].parentNode.dataset.weight, 10) || 100;
+                snippets[k].parentNode.dataset.weight = sum;
+            }
+            var random_number = Math.random() * sum;
+            for (var k = 0; k < snippets.length; k++) {
+                if (random_number < snippets[k].parentNode.dataset.weight) {
+                    return snippets[k];
+                }
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    // Check whether we have the user's country stored and if it is still valid.
+    function haveUserCountry() {
+        // Check if there's an existing country code to use.
+        if (gSnippetsMap.get('geoCountry')) {
+            // Make sure we have a valid lastUpdated date.
+            var lastUpdated = Date.parse(gSnippetsMap.get('geoLastUpdated'));
+            if (lastUpdated) {
+                // Make sure that it is past the lastUpdated date.
+                var now = new Date();
+                if (now < lastUpdated + GEO_CACHE_DURATION) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    function getUserCountry() {
+        if (haveUserCountry()) {
+            return gSnippetsMap.get('geoCountry').toLowerCase();
+        } else {
+            return null;
+        }
+    }
+
+    // Download the user's country using the geolocation service.
+    function downloadUserCountry() {
+        $script(GEO_URL, 'geo');
+        $script.ready('geo', function() {
+            try {
+                gSnippetsMap.set('geoCountry', geoip_country_code());
+                gSnippetsMap.set('geoLastUpdated', new Date());
+            } catch (e) {
+                // Most likely failed to load JS file. Continue on without us,
+                // we'll try again next time.
+            }
+        });
+    }
+
+    // Notifies stats server that the given snippet ID
+    // was shown. No personally-identifiable information
+    // is sent.
+    function send_impression(id) {
+        if (Math.random() <= SAMPLE_RATE) {
+            var locale = document.getElementById('snippet_set').getAttribute('data-locale');
+            var url = STATS_URL + '?snippet_name=' + id + '&locale=' + locale;
+            var r = new XMLHttpRequest();
+            r.open('GET', url);
+            r.send();
+        }
+    }
+    // Modifies the given links to include the specified GET parameters.
+    function modifyLinks(links, parameters) {
+        for (var k = 0, len = links.length; k < len; k++) {
+            var link = links[k];
+            var delimeter = (link.href.indexOf('?') !== -1 ? '&' : '?');
+
+            // Pull the fragment off of the link
+            var fragment_position = link.href.indexOf('#');
+            if (fragment_position === -1) {
+                fragment_position = link.href.length;
+            }
+
+            var href = link.href.substring(0, fragment_position);
+            var fragment = link.href.substring(fragment_position);
+
+            link.href = href + delimeter + parameters + fragment;
+        }
+    }
+
+    // Check for localStorage support. Copied from Modernizr.
+    function supportsLocalStorage() {
+        var s = 'snippets-test';
+        try {
+            localStorage.setItem(s, s);
+            localStorage.removeItem(s);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
+})(window.showDefaultSnippets);
+//]]>
+</script></div>

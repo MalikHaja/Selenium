@@ -1,0 +1,863 @@
+<script language=javascript>
+    function SetCustomLocale()
+    {
+         return '';
+    }
+</script>
+
+<script language="javascript" src="../common/ValidationConsts.js"></script>
+<script language="javascript" src="../common/validation.js"></script>
+<script language="javascript" src="../common/Common.js"></script>
+
+<script language="javascript">
+
+function logout()
+{    
+    document.location.href = "../common/AdminSecurity.asp?exit=1";
+}
+function sessionExpireLogout()
+{
+    if (top.location != location) 
+    { 
+         top.location.href =  "../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+    }
+    else
+    {
+	    document.location.href ="../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+	}
+}
+</script>
+
+
+
+<script language="javascript">
+	var strAEAltName = "Enrollment";	
+</script>
+<script language="javascript" src="../common/clientDA.js"></script> 
+
+<html>
+<head>
+<TITLE>ApplyYourself Webcenter</TITLE>
+
+<script language="javascript">
+	this.history.forward(1);
+</script>
+
+<link rel="stylesheet" href="../common/stylesheet.css">
+<script language="javascript" src="../common/common.js"></script>
+
+
+<script language="javascript">
+var blnAllChecked 
+blnAllChecked = false
+
+function loader(){
+loadImages();
+}
+
+function RedirectToProperPage()
+{
+	if ("" == "manageQueries") 
+	{
+		document.frmMain.action = "../AYManageQueries/Manage_Queries.asp?d=" + getTimeStamp() + "&nav=NIq2AU5AMYE%3D";
+		document.frmMain.submit();	
+	}
+	else
+	{
+		document.frmMain.action='./search_for_student_record.asp?nav=NIq2AU5AMYE%3D';
+		document.frmMain.submit();
+	}
+}
+
+function EditInquiry(ID)
+{
+
+	window.open("../AYManageInquires/AYManage_Inquiry_ViewEdit.asp?d=" + getTimeStamp() + "&PackageAnswerID=" + ID, "ManageInquiryEdit", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=650, height=500, left=50 top=50");	
+}
+
+function EnrollmentSummary(ID)
+{
+	window.open("../AYManageEnrollment/AYManageEnrollment.asp?d=" + getTimeStamp() + "&PAID=" + ID, "ManageEnrollmentEdit", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=650, height=500, left=50 top=50");
+}
+
+function changeAllChecked()
+{
+	if (blnAllChecked)
+	{
+		checkAll(false);
+		blnAllChecked = false;
+	} else
+	{
+		checkAll(true);
+		blnAllChecked = true;
+	}
+}
+
+function checkAll(blnIfChecked)
+{
+	var objStudentIDs
+	
+	objStudentIDs = document.frmMain.StudentIDs
+	if (objStudentIDs != null)
+	{
+		if (objStudentIDs.length)
+		{
+			for (var index = 0; index < objStudentIDs.length; index++)
+			{
+				objStudentIDs[index].checked = blnIfChecked;
+			}
+		}
+		else
+		{
+			objStudentIDs.checked = blnIfChecked;
+		}
+	}
+}
+
+function ApplicantSummary(ID)
+{
+	window.open("../AYApplicantSummary/ApplicantSummary.asp?d=" + getTimeStamp() + "&SelectedIDs=" + ID, "ManageApplicantEdit", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=720, height=600, left=50 top=50");
+}
+
+function AppSummaryInProgress(strPackAnsID, blnViewPreSubmit)
+{	
+	window.open("../AYApplicantSummary/ApplicantSummary_PreSub2.asp?d=" + getTimeStamp() + "&PackageAnswerID=" + strPackAnsID + "&ViewPreSubmit=" + blnViewPreSubmit, "ApplicantSummary", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=720, height=600, left=50 top=50");		
+
+}
+
+
+function openPrintApplication (strURL)
+		{
+			window.open(strURL + "&d=" + getTimeStamp(), "AppSummary", "directories=no,menubar=no,status=no,toolbar=no,resizable=yes,scrollbars=yes,location=no,titlebar=no ,width=700, height=500");
+		}	
+
+
+function print(strPackAnsID,strAppClientID) {
+			openPrintApplication ("../AYApplicantMain/Application_" + strAppClientID + ".pdf?paid="+ strPackAnsID +"&ct=PDF");
+		}
+
+
+function quickView(strPackAnsID) 
+{
+	window.open ("../AYQuickView/QuickView.asp?PackageAnswerID=" + strPackAnsID, "ApplicantSummary", "scrollbars=yes, resizable=yes, status=no, menubar=no, toolbar=no, width=650, height=400, left=100 top=50");
+}
+
+function getPage(intDiff)
+{	
+	var lngPageNumber;
+	lngPageNumber = eval(document.frmMain.PageNumber.value) + intDiff;
+	
+	document.frmMain.PageNumberToGo.value = lngPageNumber;
+	//document.frmMain.PageNumber.value = lngPageNumber;
+	document.frmMain.submit();
+}
+
+function gotoPage(intPageNum)
+{	
+	//document.frmMain.PageNumber.value = intPageNum;
+	document.frmMain.PageNumberToGo.value = intPageNum;
+	document.frmMain.submit();
+}
+
+function findduplicate(strSelectedValue, dupvalue)
+{
+	var arrayids = strSelectedValue.split(",");
+						
+	var part_num=0;
+	while (part_num<arrayids.length)
+	{	
+		if (arrayids[part_num] == dupvalue )		
+			return true;		
+		part_num+=1;
+	}
+	return false;
+}
+
+function gotoinprocess()
+{
+	if ((validateSelectionRequired(document.frmMain.ActionTypeID, "Select a Action Type")))	
+	{
+		// Build selected
+		var strSelected = "";
+		// Get selected from other page
+		strSelected = document.frmMain.SelectedList.value;
+		// Get selected from this page
+		var objStudentIDs;
+		objStudentIDs = document.frmMain.StudentIDs;
+
+		if (objStudentIDs != null)
+		{
+			if (objStudentIDs.length)
+			{
+				for (var index = 0; index < objStudentIDs.length; index++)
+				{				
+					if (objStudentIDs[index].checked)
+					{						
+						if (findduplicate(strSelected,objStudentIDs[index].value)==false)
+						{
+							if (strSelected != "")
+							{
+								strSelected = strSelected + ","
+							}
+							strSelected = strSelected + objStudentIDs[index].value;
+						}
+					}
+				}
+			} 
+			else
+			{
+				if (objStudentIDs.checked)
+				{					
+					if (findduplicate( strSelected , objStudentIDs.value ) == false)
+					{
+						if (strSelected != "")
+							{
+								strSelected = strSelected + ","
+							}					
+						strSelected = strSelected + objStudentIDs.value;
+					}
+				}				
+			}
+		}
+
+		document.frmMain.SelectedIDs.value = strSelected;
+
+		if (strSelected == "" && document.frmMain.ApplyTo[0].checked == true)
+		{
+			gErrString = "";
+			addError("No records were selected. Please try again.", "Select Record", "");
+			displayErrors();	
+		}
+		else	
+		{	
+			if (document.frmMain.ActionTypeID.value == 10)
+			{
+				var blnDeleteResult;
+				var strApplyTo = GetRadioValue(document.frmMain, "ApplyTo");
+				var intCount;
+				
+				if (strApplyTo == "all")
+				{
+					intCount = "1";
+				}
+				else 
+				{
+					var arrayPackageAnswerIDs = strSelected.split(",");			
+					intCount = arrayPackageAnswerIDs.length;
+				}
+				
+				if (intCount > 1)
+				{
+					strMessage = gErrMultiDeletePreConfirmMsg
+				}
+				else if (intCount = 1)
+				{
+					strMessage = gErrSingleDeletePreConfirmMsg
+				}
+				
+				blnDeleteResult = confirm(strMessage);
+				
+				if (blnDeleteResult)
+				{
+					document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+					document.frmMain.submit();
+				}	
+			}
+			else if (document.frmMain.ActionTypeID.value == 23)
+			{
+				
+				var blnResult;				
+				
+				blnResult = confirm(gErrConfAddFeePay);
+				
+				if (blnResult)
+				{
+					document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+					document.frmMain.submit();
+				}	
+			}
+			else if (document.frmMain.ActionTypeID.value == 57)
+			{
+				
+				var blnResult;				
+				
+				blnResult = confirm('Please verify that you wish to waive required recommendation-shiva for the selected records by clicking on the OK button below.');
+				
+				if (blnResult)
+				{
+					document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+					document.frmMain.submit();
+				}	
+			}
+			else 
+			{
+				if (document.frmMain.ApplyTo[0].checked == true)
+				{
+					document.frmMain.totalRecNum.value = (strSelected.split(",")).length
+				}
+				document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+				document.frmMain.submit();
+			}	
+		}		
+	}
+	else
+	{	
+		displayErrors(); 
+	}
+}
+
+function GetRadioValue(frmForm, strRadioName)
+{
+	var strReturnValue = "";
+					
+	var objRadio = frmForm.elements[strRadioName];
+	if (objRadio != null)
+	{
+		var nLength = objRadio.length;
+		var nIndex = 0;
+		for (nIndex=0; nIndex<nLength; nIndex++)
+		{
+			if (objRadio[nIndex].checked)
+				strReturnValue = objRadio[nIndex].value;
+		}
+	}		
+	return strReturnValue;	
+}
+
+function SubmitApplication(lngPackageAnswerId, streSignName)
+{
+	var msg = "Do you want to submit this application?";
+	if (confirm(msg))
+	{
+		document.frmMain.action = "../AYSearchForStudent/SubmitApplication.asp?PAID=" + lngPackageAnswerId + "&esignname=" + escape(streSignName) + "&d=" + getTimeStamp();
+		document.frmMain.submit();	
+	}
+}
+
+
+function gotoProcess()
+{
+
+	var strValue
+	var blnReturn = true;		//set default output
+	gErrString = "";			// make sure to initialize the global error string each time you validate.
+	var objItem;
+	var strCurPage
+	
+	// Check ApplyTo Radio buttons
+	blnReturn = validateRadioButtonRequired(document.frmMain.ApplyTo, "Apply To");	
+	// Check action histroy type selection
+	
+	if ((!validateSelectionRequired(document.frmMain.ActionTypeID, "Select a Action Type")) && blnReturn)
+	{
+		blnReturn = false;
+	}	
+	if (blnReturn)
+	{		
+		// Build selected
+		var strSelected = ""
+
+		// Get selected from other page
+	    strSelected = document.frmMain.SelectedList.value;
+		// Get selected from this page
+		var objStudentIDs;
+		objStudentIDs = document.frmMain.StudentIDs;		
+
+		if (objStudentIDs != null)
+		{
+			// if more than one, length is defined
+			if (objStudentIDs.length)
+			{				
+				for (var index = 0; index < objStudentIDs.length; index++)
+				{					
+					if (objStudentIDs[index].checked)
+					{						
+						if (strSelected.indexOf( objStudentIDs[index].value ) == -1 )
+						{
+					
+							if (findduplicate(strSelected,objStudentIDs[index].value)==false)
+							{
+								if (strSelected != "")
+								{
+									strSelected = strSelected + ","
+								}	
+								strSelected = strSelected + objStudentIDs[index].value;
+							}
+						}
+					}			
+				}
+			}
+			else
+			{
+				if (objStudentIDs.checked)
+				{					
+					if (findduplicate(strSelected,objStudentIDs.value)==false)
+					{
+						if (strSelected != "")
+						{
+							strSelected = strSelected + ","
+						}
+						strSelected = strSelected + objStudentIDs.value;
+					}
+				}
+			}
+		}
+
+		document.frmMain.SelectedIDs.value = strSelected;
+
+		if (strSelected == "" && document.frmMain.ApplyTo[0].checked == true)
+		{
+			gErrString = "";
+			addError("No records were selected. Please try again.", "Select Record", "");
+			displayErrors();
+		}
+		else
+		{
+			if (document.frmMain.ActionTypeID.value == 10)
+			{
+				var strMessage;
+				var blnDeleteResult;
+				var strApplyTo = GetRadioValue(document.frmMain, "ApplyTo");
+				var intCount;
+				if (strApplyTo == "all")
+				{
+					intCount = "1";
+				}
+				else 
+				{
+					var arrayPackageAnswerIDs = strSelected.split(",");			
+					intCount = arrayPackageAnswerIDs.length;
+				}
+				
+				if (intCount > 1)
+				{
+					strMessage = gErrMultiDeletePreConfirmMsg
+				}
+				else if (intCount = 1)
+				{
+					strMessage = gErrSingleDeletePreConfirmMsg
+				}
+				
+				blnDeleteResult = confirm(strMessage);
+				
+				if (blnDeleteResult)
+				{
+					document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+					document.frmMain.submit();
+				}	
+			}
+			else
+			{
+				if (document.frmMain.ApplyTo[0].checked == true)
+				{
+					document.frmMain.totalRecNum.value = (strSelected.split(",")).length
+				}
+				document.frmMain.action = "../AYProcessSearchResults/process_search_results_action.asp";
+				document.frmMain.submit();
+			}
+		}
+	} 
+	else
+	{
+		displayErrors(); // else, we didn't pass all validaiton, display the errors.
+	}
+}
+
+function sortBy(strSortField){
+	document.frmMain.OrderBy.value = strSortField;
+	document.frmMain.submit();
+}
+
+/*
+AJAX*/
+function ToggleRecordSummary(lngAppID)
+{
+//Added new fields for display on the search screen.
+//Added by Roshna -01/09/2008
+	ToggleSummary(lngAppID, document.frmMain, "11,13,77,s1,s2,41,43,44,45", "AFBB3EB-21B7-4A8E-87CA-D6E6A76E07D");
+}
+
+</script>
+</head>
+<body style="word-wrap:break-word" bgcolor="#FFFFFF" onLoad="javascript:loader();" marginheight=0 marginwidth=0 topmargin=0 leftmargin=0>
+<script language="javascript">
+
+function loadImages()
+{
+//MM_preloadImages('../images/left_menu/main_choice_o.gif','../images/left_menu/sub_choice_o.gif','../images/top_nav/main_o.gif','../images/top_nav/top_right2_o.gif','../images/common_images/contact_hd_o.gif','../images/common_images/press_releases_o.gif','../images/common_images/spotlights_o.gif','../images/common_images/faq_o.gif')
+}
+
+</script>
+<!--- Session Timeout --->
+<!--- default header.asp --->
+
+<SCRIPT LANGUAGE="JAVASCRIPT">
+var	onesecond = 1000;
+var	oneminute = 60 * onesecond;
+var	fiveminutes = 5 * oneminute;
+var sessiontimeout = "120" * oneminute;
+/*
+function warningTimer()
+{
+	timeinterval = sessiontimeout - fiveminutes; // (60 - 5)
+	timer=setTimeout("alert('Your session will expire in 5 minutes!')", timeinterval);
+}
+*/
+function warningTimer()
+{
+	var popWindow;
+	var w = 500, h = 340;
+	if (document.all) 
+	{
+	   /* the following is only available after onLoad */
+	   w = document.body.clientWidth;
+	   h = document.body.clientHeight;
+	}
+	else if (document.layers) {
+	   w = window.width;
+	   h = window.height;
+	}
+	var popW, popH, lefPos, topPos;
+
+	if (document.all)
+	{
+		popW = 320; //fix width for IE
+		popH = 120; //fix height for IE
+    	leftPos = (w-popW)/2;
+		topPos = (h-popH)/2;
+		propertySet = " scrollbars=no, resizable=no, status=no, menubar=no, toolbar=no, width=370, height=120, top="+ topPos + ",left=" + leftPos + " ";
+	}
+	else
+	{
+		popW = 320; // fix width for NS
+		popH = 100;  //fix height for NS
+    	leftPos = (w-popW)/2;
+		topPos = (h-popH)/2;
+		propertySet = "toolbar=no,menubar=no,locationbar=no,scrollbars=no,resizable=no,status=no,screenX=" + leftPos + ",screenY=" + topPos + ",width=370,height=100";
+	}
+	
+	timeinterval = sessiontimeout - fiveminutes; // (20 - 5)
+	popWindow = "window.open('../common/SessionExpireMsg.asp', 'Error', '" + propertySet + "' )";
+	timer = setTimeout(popWindow, timeinterval);
+}
+
+function sessionTimer()
+{
+	var fivesecond = 5 * onesecond;
+	var sessiontimeout_5 = sessiontimeout - fivesecond; // before 5 seconds to redirect logout  page
+	timer=setTimeout("window.location.href='javascript:sessionExpireLogout();'", sessiontimeout_5);
+}
+
+function techSupportWindow ()
+{
+	var Now = new Date();
+	
+	if (document.all)
+		gNewWin = window.open("http://qawebcenter.applyyourself.com/AYContactHelpDesk/TechSupport.asp?AYID=AFBB3EB-21B7-4A8E-87CA-D6E6A76E07D&d=" + escape(Now.getTime()), "TechSupport", "scrollbars=yes, resizable=yes, status=yes, menubar=no, toolbar=no, width=1000, height=740,left=50,top=30");
+	else
+		gNewWin = window.open("http://qawebcenter.applyyourself.com/AYContactHelpDesk/TechSupport.asp?AYID=AFBB3EB-21B7-4A8E-87CA-D6E6A76E07D&d=" + escape(Now.getTime()), "TechSupport", "toolbar=no,menubar=no,locationbar=no,scrollbars=yes,resizable=yes,status=yes,screenX=50,screenY=30,width=1000,height=740");
+}
+	
+function windowPopOpen(theURL,winName,features) 
+{ 
+    window.open(theURL,winName,features);
+}
+
+function updateProfile()
+{
+    window.location.href = '../AYMaintainUsers/UserProfileUpdate.asp';
+}
+
+
+</SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT">warningTimer();</SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT">sessionTimer();</SCRIPT>
+
+<table width="750" border="0" cellspacing="0" cellpadding="0" height="100%">
+
+ <!-- begin masthead -->
+  <tr align="right" valign="top">
+    <td rowspan="2" class="logoCell"><img src="../images/common_images/logo.png" height="51" width="157"></td>
+    <td class="formtext userInfo" >
+        
+            Welcome For (ayauto) | 
+            
+	        <a href="javascript:techSupportWindow();">online support</a> |
+	    
+    	 <a href="javascript:logout();">logout</a>
+	</td>
+  </tr>
+  <tr>
+  	<td class="gotoCell">
+  		
+    </td>
+  </tr>
+  
+  <tr> 
+    <td colspan="2" class="mastBar">&nbsp;</td>
+  </tr>
+  <!-- end masthead -->
+    <tr> 
+   <td id="menuCol" height="100%" align="right" valign="top">
+    
+        <div class="small-text center">Application for QA Automation</div>
+    
+<style type="text/css"> 
+  /* DEFAULT STYLES ---- NEEEDED START */
+  .clCMEvent{position:absolute; width:99%; height:99%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:visible}
+  .clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+  /* DEFAULT STYLES ---- NEEEDED END */
+  .clT, .clTover, .clTSub, .clToverSub, .clTSub2, .clToverSub2 {position:absolute; font-family:arial,helvetica; cursor:pointer; font-size: 12px; text-align: left; }
+  .clT, .clTover{ padding:0; }
+  .clT .clT, .clT .clTover {padding: 5px 0 5px 5px; line-height: 17px;}
+  .clTSub, .clToverSub, .clTSub2, .clToverSub2 { padding:0; text-indent: 5px; line-height: 25px; }
+  .clT, .clTSub, .clTSub2 { color:#000; background-color:#E5E4D9; }
+  .clTover, .clToverSub, .clToverSub2 {color:#fff; background-color:#17469E;}
+  .clTSub, .clTSub2 {border:1px solid #B1B1B1;}
+</style>
+
+<script language="JavaScript" src="../Common/coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+
+<script language="JavaScript">
+	function newwindow(url)
+	{
+	
+	 window.open(url ,"", "toolbar=no,menubar=no,locationbar=no,scrollbars=no,resizable=no,status=no,width=700, height=400,left=100");
+	}
+	
+	/********************************************************************************
+	Construct your menus below
+	********************************************************************************/
+	
+	//Main items:
+	oMenu.makeMenu('','','<span class="menu_heading">Main Menu</span>','../AYClientAdmin/ClientMain.asp?d=9%2F12%2F2014+3%3A18%3A21+AM')
+oMenu.makeMenu('','','<span class="menu_heading">Application</span>','../AYClientAdmin/packageMain.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAddApp',0,'Add an Applicant')
+oMenu.makeMenu('','mnuAddApp','Add a Manual Application','../AYSecurity/CreateAppAccAdmin.asp?nav=NIq2AU5AMYE%3D','_blank')
+oMenu.makeMenu('','mnuAddApp','Add a QuickAdd Application','../AYApplicantMain/AYQuickAddForms.asp?PageSource=yes&d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D','_blank')
+oMenu.makeMenu('','','Search for Applicants','../AYSearchForStudent/search_for_student_record.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','','Identify Duplicates','../AYDuplicates/SelectAppDupCriteria.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdmin','','Application Administration')
+oMenu.makeMenu('','mnuAppAdmin','Configure Forms','../AYDataCatalogTree/Main.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Style Sheet','../AYManageHTML/Style.asp?mode=p&d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Dynamic Text','../AYDynamicText/DynamicText.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Download Forms','../AYDownloadForms/DownloadForms.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdminCodeLookup','mnuAppAdmin','Manage Code Lookup')
+oMenu.makeMenu('','mnuAppAdminCodeLookup','Add/Edit Lookup Values','../AYManageCodeLookUp/ListCodeLookUp.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminCodeLookup','Configure Code Lookup','../AYCodeLookup/code_lookup_configure.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure AVS','../AYCodeLookup/AVS_configure.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Upload Images','../AYUploadImages/UploadImages.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Business Rules','../AYConfigBusRules/BRDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Decision Letters','../AYDecision/DecisionTemplatesList.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuWCConfig','','WebCenter Administration')
+oMenu.makeMenu('','mnuWCConfig','Configure Prospect Match','../AYMatchProspects/AYMatchProspects.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Configure Duplicates','../AYDuplicates/Configure_Duplicates.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Folders','../AYManageGroups/ManageGroups.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Groups','../AYManageAppGroups/ManageAppGroups.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Package','../AYClientAdmin/EditView_Package.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Queries','../AYManageQueries/manage_queries.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage RA Accounts','../AYACLAdmin/ACLList_webcenter.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdminTemplates','mnuWCConfig','Manage Templates')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Email Templates','../AYMANEMAILTEMPS/METDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Export Templates','../AYConfigExports/configure_exports.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Import Templates','../AYConfigImports/configure_imports_webcenter.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuImports','','Imports')
+oMenu.makeMenu('','mnuImports','Run Import','../AYRunImport/Import_Admin.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuImports','Monitor Import Status','../AYRunImport/Import_Monitor.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuManComm','','Manage Communications')
+oMenu.makeMenu('','mnuManComm','Configure Tracks','../AYManageTracks/Manage_Tracks.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Manage Email Metrics','../AYManageCampaigns/CampaignsList.asp?d=9%2F12%2F2014+3%3A18%3A21+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Manage Email Templates','../AYMANEMAILTEMPS/METDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Monitor Scheduled Email','../AYMonitorMassEmail/MassEmailSearch.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAnalysis','','Applicant Analysis')
+oMenu.makeMenu('','mnuAppAnalysis','Ad Hoc Analysis','../AYActReportTemplate/Act_Report_Template_addedit.asp?AdHoc=1&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAnalysis','Data Analysis Templates','../AYActReportTemplate/Manage_Act_Report_Template.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAnalysis','Online Payment Reports','../AYReports/System_Reports.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu(0,0,0,'../ayclientadmin/packageMain.asp?d=9%2F12%2F2014+3%3A18%3A21+AM',0,150,25,'../images/common_images/clearspacer.gif');
+oMenu.makeMenu('mnuSelMod','','Change Systems');oMenu.makeMenu('mnuInquiry','mnuSelMod','Prospect System')
+oMenu.makeMenu('mnuAdm','mnuSelMod','Application System')
+oMenu.makeMenu('mnuEvent','mnuSelMod','Event System')
+oMenu.makeMenu('','mnuInquiry','Prospect Package','../AYClientAdmin/moduleMain.asp?ModuleName=Inquiry&ModuleID=164&PackageID=447&PackageName=Prospect Package&PackageTypeName=Inquiry Package')
+oMenu.makeMenu('','mnuAdm','Application for QA Automation','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=419&PackageName=Application for QA Automation&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Recommendation','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=420&PackageName=Recommendation&PackageTypeName=Recommendation')
+oMenu.makeMenu('','mnuAdm','Enrollment','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=427&PackageName=Enrollment&PackageTypeName=Enrollment')
+oMenu.makeMenu('','mnuAdm','Application2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=451&PackageName=Application2&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Recommendation2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=452&PackageName=Recommendation2&PackageTypeName=Recommendation')
+oMenu.makeMenu('','mnuAdm','Test','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=497&PackageName=Test&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Enrollment2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=503&PackageName=Enrollment2&PackageTypeName=Enrollment')
+oMenu.makeMenu('','mnuEvent','Event Package','../AYClientAdmin/moduleMain.asp?ModuleName=Event&ModuleID=166&PackageID=449&PackageName=Event Package&PackageTypeName=Event')
+	
+	/************************End menu construction****************************************************/
+	//When all the menus are written out we instantiate the menus
+	
+	oMenu.construct()
+</script>
+</td>
+<td align="right" height="100%" valign="top" id="contentCol">
+<div align="left" id="divAyConfirmation" style="display:none;width:580px;" class="AYConfirmationText"></div>
+
+<form method="post" name="frmMain" action="">
+<input type="hidden" name="AYFormID" value="F2F9FDE131680A369F2A02341E66BA5C22548605" ID="Hidden1"> 
+<input type="hidden" name="NoRecords" value="1">
+
+<input type="hidden" name="submittedApps" value="Yes">
+
+<input type="hidden" name="totalRecNum" value="1">
+<input type="hidden" name="OrderBy" value="">
+<input type="hidden" name="RequiredQComp" value="">
+<input type="hidden" name="ChkAgree" value="">
+	
+		<table width="580" border="0" cellspacing="0" cellpadding="0" id="ResultsTable">
+		  <tr align="left" class="FormText"> 
+		    <td valign="middle" colspan="6" class="FormText"><DIV ID="AYInstructions" style="display:none" class="FormText">Use this page to access specific applicant records or to perform actions. To view a single record, simply click on the student's name, and you will be redirected to the applicant summary screen. To perform actions on multiple students, please follow the steps outlined below: 
+<ul><li type="square">Mark each student's record by clicking in the appropriate checkbox. 
+<li type="square">Select the action you would like to perform by choosing an option from the drop-down Action list at the bottom of the page. 
+<li type="square">Indicate whether you would like to perform the action on marked records (Apply to Selected) or all records returned in your search (Apply to All). 
+<li type="square">Click the Go button to perform the action. Some selections, such as email or run export, will direct you to an additional page where you will be prompted to select a template to apply to the action.</ul>
+<img src="../images/common_images/dividing_line.gif" width="579" height="5"><br><br></DIV>
+<font style="font-size: 8pt; font-family: Arial,Sans-Serif;">
+Application Module :: Search Results
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+	&nbsp;&nbsp;&nbsp;&nbsp;Sort:&nbsp;&nbsp;<INPUT TYPE="radio" name="SortType" value=" ASC "  Checked >Ascending &nbsp;&nbsp; <INPUT TYPE="radio" name="SortType" value=" DESC " >Descending </font></td>
+		  </tr>
+		  <tr align="left" class="FormText"> 
+		    <td valign="middle" bgcolor="#CCCCCC" colspan="2" class="FormText">
+		      <A HREF="javascript:show('AYInstructions')"><font class="FormText" color="#000000">show</font></A> 
+		      | <A HREF="javascript:hide('AYInstructions')"><font class="FormText" color="#000000">hide</font></A> 
+		      <font class="FormText" color="#000000">instructions</font></td>
+	
+		  
+		  <td valign="middle" bgcolor="#cccccc"><font class="FormText">
+			Record: 1 - 1 of 1</font></td>
+		    <td valign="middle" bgcolor="#CCCCCC" colspan="3" class="FormHeading" align="right"> 
+		   	&nbsp;</td>
+		  </tr>
+		  
+			  <tr align="left" class="FormText">
+				<td valign="middle" colspan="6" class="FormText">
+					<table width="580" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed"><tr><td class="FormText"><b>Selection Criteria: </b> Submitted applicants where PIN is 49788357XM8</td></tr></table>
+				</td>
+			  </tr>
+			  <tr align="left"> 
+				<td valign="middle" colspan="6"><img src="../images/common_images/dividing_line.gif" width="579" height="5"></td>
+			  </tr>
+		  
+		  <tr align="left" class="FormHeading"> 
+		    <td valign="middle" align="center"></td>
+		    <td valign="middle" align="left" class="FormHeading"><A href="javascript:sortBy(' Order By LastName, FirstName ');" class="2">Name</A></td>
+		    <td valign="middle" align="left" class="FormHeading"><A href="javascript:sortBy(' Order By email ');" class="2">Email Address</A></td>
+		    <td valign="middle" align="center" class="FormHeading"><A href="javascript:sortBy(' Order By submittedDate ');" class="2">Submitted</A></td>
+			<td valign="middle" align="center" class="FormHeading"><A href="javascript:sortBy(' Order By ExportedDate ');" class="2">Export</A></td>
+		   <td valign="middle" align="center" class="FormHeading"> </td>
+		  </tr>
+		  <tr align="left"> 
+		    <td valign="middle" colspan="6"><img src="../images/common_images/dividing_line.gif" width="579" height="5"></td>
+		  </tr>
+		  <tr class='FormText'>
+<td align="center" valign="middle"> <input type="checkbox" name="StudentIDs" value="2077364"></td><td align="left" valign="middle"><A HREF='javascript:ApplicantSummary(2077364)' class='2'>TestAutomation1410505290103, TestSmoke091220141410505289757</A></td>
+<td width="200" align="left" valign="middle"><a href="mailto:emtqaaccount@hobsons.com" class='2'>emtqaaccount@hobsons.com</a>&nbsp;</td>
+<td align="center" valign="middle">9/12/2014</td>
+<td align="center" valign="middle">N</td>
+<td align='center'><A HREF='javascript:quickView(2077364)'><img src='../images/common_images/quickview_icon.gif' alt='Quick View Details' border='0'></a>&nbsp;&nbsp;<A HREF='javascript:print(2077364,1947431)'><img src='../images/common_images/icon_pdf.gif' alt='Print Application' border='0'></a></td>
+</tr>
+
+		  <tr> 
+		    <td align="left" valign="top" colspan="6"><img src="../images/common_images/dividing_line.gif" width="579" height="5"></td>
+		  </tr>
+		  <tr> 
+		    <td valign="top" class="FormText" align="left">&nbsp;<img src="../Images/common_images/check_box.gif" width="24" height="12" onCLick="Javascript:changeAllChecked();"></td>
+		    <td valign="top" align="left" class="FormText">Click to select or deselect all records on this page</td>
+		    <td valign="top" colspan="4" align="right"class="FormHeading">Select an Action:
+		      <select name="ActionTypeID" class="FormFields">
+		        <option selected value = ""> 
+		        -- Select --
+		        </option>
+		        <option  value="5">Add/Remove Group</option>
+<option  value="46">Add/Remove Track</option>
+<option  value="56">Assign AppReview Status</option>
+<option  value="9">Batch Update</option>
+<option  value="2">Create Label</option>
+<option  value="47">Create Letter</option>
+<option  value="10">Delete</option>
+<option  value="52">Execute Business Rules</option>
+<option  value="4">Export</option>
+<option  value="42">Invite to Event</option>
+<option  value="18">Post Message</option>
+<option  value="8">Print Application</option>
+<option  value="6">Record Action</option>
+<option  value="17">Run Reports</option>
+<option  value="1">Send Email</option>
+<option  value="22">System Batch Update</option>
+<option  value="49">Unsubscribe</option>
+
+		      </select><br>
+		      <input type="radio" name="ApplyTo" value="selected" checked>Apply to Selected &nbsp;&nbsp;
+			  <input type="radio" name="ApplyTo" value="all">Apply to All
+		    </td>
+		  </tr>
+		  <tr class="FormHeading"> 
+		    <td align="left" valign="middle" bgcolor="#CCCCCC" class="FormHeading" colspan="2">&nbsp;<a href="./search_for_student_record.asp"><img src="../Images/common_images/new_search_large.gif" width="100" height="11" border="0"></a>&nbsp;<a href="javascript:RedirectToProperPage();"><img src="../Images/common_images/admin_back_small_n.gif" height="11" border="0"></a></td><td align="left" valign="middle" bgcolor="#CCCCCC" class="FormHeading">&nbsp;&nbsp;&nbsp;</td>
+		    <td align="right" valign="top" bgcolor="#CCCCCC"class="FormHeading" colspan="3"> 
+		     <a href="Javascript:gotoProcess();"><img src="../Images/common_images/go_small_n.gif" border=0></a>&nbsp;</td>
+		  </tr>
+		  <tr align="left" valign="top"> 
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="30"></td>
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="175"></td>
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="215"></td>
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="70"></td>
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="45"></td>
+		    <td><img src="../images/common_images/spacer.gif" height="5" width="45"></td>
+		  </tr>
+		</table>		  
+		<INPUT type="Hidden" name="SelectedList" value=""><INPUT type="hidden" name="PageNumberToGo" value="1"><INPUT type="hidden" name="SearchTypes" value="requery"><INPUT type="hidden" name="PageSize" value="50"><INPUT type="hidden" name="PageNumber" value="1"><INPUT type="Hidden" name="SelectedIDs" value=""><INPUT type="Hidden" name="RecordType" value="yes"><INPUT type="hidden" name="SearchTypeField" value="individual"><INPUT type="hidden" name="QueryId" value=""><INPUT type="hidden" name="GroupId" value=""><INPUT type="hidden" name="ActionId" value=""><INPUT type="hidden" name="IsQuery" value=""><INPUT type="hidden" name="SearchCriteria" value="Submitted applicants where PIN is 49788357XM8"></form><script language="javascript">
+gErrString = ""
+</script></td>
+  </tr>
+<tr class="FormTextSmall"> 
+    <td align="left" valign="top" class="footerCell">&nbsp;</td>
+    
+  <td align="center" valign="middle" class="footerCell borderTop borderRight">&nbsp;</td>
+  </tr>  
+<tr> 
+    <td align="left" valign="top" colspan="2" class="footerCell borderRight">
+    <div class="footerLinks">
+    	<a href="javascript:techSupportWindow();">Online Support</a> | <a href="javascript:newwindowProdSuggestion('../AYClientAdmin/ProductSuggestions.asp', 1000);">Product Suggestions </a>
+    </div>
+        
+               All times are in (GMT-05:00) Eastern Time (US & Canada), unless otherwise specified.<br /> &copy; Copyright 1998-2014 Hobsons Inc. All Rights Reserved.
+          
+    </td>
+  </tr>
+
+
+
+ 
+ <script language="JavaScript">
+
+    function newwindowProdSuggestion(url, w) 
+    {
+    var left = (screen.width / 2) - (w / 2);    
+    window.open(url, "", "toolbar=no,menubar=no,locationbar=no,scrollbars=yes,resizable=yes,status=no,width=1000,height=650,left=" + left);
+	}
+
+	</script>
+</body>
+</html>

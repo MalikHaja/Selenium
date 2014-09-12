@@ -1,0 +1,930 @@
+
+<script language="javascript" src="../common/ValidationConsts.js"></script>
+<script language="javascript" src="../common/validation.js"></script>
+<script language="javascript" src="../common/common.js"></script>
+
+<script language=javascript>
+    function SetCustomLocale()
+    {
+         return '';
+    }
+</script>
+
+<script language="javascript">
+
+function logout()
+{    
+    document.location.href = "../common/AdminSecurity.asp?exit=1";
+}
+function sessionExpireLogout()
+{
+    if (top.location != location) 
+    { 
+         top.location.href =  "../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+    }
+    else
+    {
+	    document.location.href ="../common/AdminSecurity.asp?exit=1&sessionExpired=true";
+	}
+}
+</script>
+
+
+
+<META HTTP-EQUIV="expires" CONTENT="0">
+<html>
+<head>
+<TITLE>ApplyYourself Webcenter</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+	var queryDesc = new Object(), groupDesc = new Object(), actionDesc = new Object();
+	function submitForm()
+	{
+		if (validate() == false || gErrString !="") {
+			displayErrors();					// else, we didn't pass all validaiton, display the errors.
+			return false;
+		}
+		return true;
+	}
+	function validate()
+	{
+		var strValue, blnReturn = true, objSearchTypes = document.frmMain.SearchTypes, strSearchType
+		gErrString = "";
+		
+		for (var i = 0; i < objSearchTypes.length; ++i)	{
+			if (objSearchTypes[i].checked)	{
+				strSearchType = objSearchTypes[i].value;
+				break;
+			}
+		}
+		
+		if (strSearchType == "query")
+		{	
+		
+			if (document.frmMain.QueryID.selectedIndex == 0)
+			{
+				document.frmMain.QueryName.value = document.frmMain.SysQuery.options[document.frmMain.SysQuery.selectedIndex].text.replace(/\xA0/g,'').replace(/^\s+|\s+$/g,'');
+			}
+			else
+			{
+				document.frmMain.QueryName.value = document.frmMain.QueryID.options[document.frmMain.QueryID.selectedIndex].text.replace(/\xA0/g,'').replace(/^\s+|\s+$/g,'');
+			}
+			if ((document.frmMain.SysQuery.selectedIndex == 0 ) && (document.frmMain.QueryID.selectedIndex == 0))
+			{
+				addError("Select a system query or user-defined query from the drop-down list." , "System Query Or User Query", "System Query Or User Query");
+				blnReturn = false;
+			}
+			if (document.frmMain.SysQuery.selectedIndex > 1) 
+			{
+				if (trim(document.frmMain.SysQuery.value) == "2" || document.frmMain.SysQuery.value =="3" || document.frmMain.SysQuery.value=="4" || document.frmMain.SysQuery.value=="8")
+					document.frmMain.action="search_for_student_systemQuery.asp"
+				
+			}
+		
+			//Added by Lalitha on 11/1/01 
+			//To assign the value of IsQuery to Query when the user selects the query to run the search
+			if (blnReturn) 
+			{
+				document.frmMain.IsQuery.value = "Query";
+			}
+		} else if (strSearchType == "individual")
+			{
+			// Trim the inputs			
+			if ("Admissions" == "Inquiry")
+			{
+				var strDelim = '', strApplyYourselfID = document.frmMain.ApplyyourSelfID.value;					
+				if (strApplyYourselfID.search(",") > -1) {
+					strDelim = ',';
+				} else if (strApplyYourselfID.search(";") > -1){
+					strDelim = ';';
+				}
+				if (strDelim != "") {						
+					var arrApplyYourselfIDs = strApplyYourselfID.split(strDelim);						
+					for (var j=0; j<arrApplyYourselfIDs.length; ++j){								
+						validateNumberBounds(arrApplyYourselfIDs[j],"","","Prospect ID","",false);
+					}
+				} else {
+					validateNumberBounds(strApplyYourselfID,"","","Prospect ID","",false);
+				}
+				document.frmMain.FirstName.value = trimString(document.frmMain.FirstName.value)
+				document.frmMain.LastName.value = trimString(document.frmMain.LastName.value)
+				document.frmMain.BirthDate.value = trimString(document.frmMain.BirthDate.value)
+				document.frmMain.Email.value = trimString(document.frmMain.Email.value)
+				document.frmMain.CreatedFrom.value = trimString(document.frmMain.CreatedFrom.value)
+				document.frmMain.CreatedTo.value = trimString(document.frmMain.CreatedTo.value)
+				if (document.frmMain.FirstName.value != "")				
+					if (document.frmMain.FirstName.value == "%")
+						addError("Please enter the valid wildcard search. Single wildcard character is not allowed","FirstName","")
+				if (document.frmMain.LastName.value != "")				
+					if (document.frmMain.LastName.value == "%")
+						addError("Please enter the valid wildcard search. Single wildcard character is not allowed","LastName","")	
+				if (document.frmMain.BirthDate.value != "")	{
+					blnReturn = validateDate("Birth Date", document.frmMain.BirthDate.value);
+				}
+				if (document.frmMain.CreatedFrom.value != "") {
+					blnReturn = validateDate("Created Date From", document.frmMain.CreatedFrom.value);
+				}
+				if (document.frmMain.CreatedTo.value != "") {
+					blnReturn = validateDate("Created Date To", document.frmMain.CreatedTo.value);
+				}
+			
+			}
+			else
+			{
+				if ("1" == "1") 
+				{
+					var strDelim = '', strApplyYourselfID = document.frmMain.ApplyyourSelfID.value;					
+					if (strApplyYourselfID.search(",") > -1) {
+						strDelim = ',';
+					} else if (strApplyYourselfID.search(";") > -1){
+						strDelim = ';';
+					}
+					if (strDelim != "") {						
+						var arrApplyYourselfIDs = strApplyYourselfID.split(strDelim);						
+						for (var j=0; j<arrApplyYourselfIDs.length; ++j){								
+							validateNumberBounds(arrApplyYourselfIDs[j],"","","Applicant ID","",false);
+						}
+					} else {
+						validateNumberBounds(strApplyYourselfID,"","","Applicant ID","",false);
+					}
+					document.frmMain.FirstName.value = trimString(document.frmMain.FirstName.value)
+					document.frmMain.LastName.value = trimString(document.frmMain.LastName.value)
+					document.frmMain.Pin.value = trimString(document.frmMain.Pin.value)
+					document.frmMain.BirthDate.value = trimString(document.frmMain.BirthDate.value)
+					document.frmMain.Email.value = trimString(document.frmMain.Email.value)				
+					if (document.frmMain.FirstName.value != "")				
+						if (document.frmMain.FirstName.value == "%")
+							addError("Please enter the valid wildcard search. Single wildcard character is not allowed","FirstName","")
+					if (document.frmMain.LastName.value != "")				
+						if (document.frmMain.LastName.value == "%")
+							addError("Please enter the valid wildcard search. Single wildcard character is not allowed","LastName","")	
+					if (document.frmMain.BirthDate.value != "")	{
+						blnReturn = validateDate("Birth Date", document.frmMain.BirthDate.value);
+					}
+				}
+				else
+				{
+					if ("1" == "5")
+					{
+						document.frmMain.FirstName.value = trimString(document.frmMain.FirstName.value)
+						document.frmMain.LastName.value = trimString(document.frmMain.LastName.value)
+						document.frmMain.BirthDate.value = trimString(document.frmMain.BirthDate.value)
+						document.frmMain.Email.value = trimString(document.frmMain.Email.value)
+						document.frmMain.CreatedFrom.value = trimString(document.frmMain.CreatedFrom.value)
+						document.frmMain.CreatedTo.value = trimString(document.frmMain.CreatedTo.value)
+						if (document.frmMain.FirstName.value != "")				
+							if (document.frmMain.FirstName.value == "%")
+								addError("Please enter the valid wildcard search. Single wildcard character is not allowed","FirstName","")
+						if (document.frmMain.LastName.value != "")				
+							if (document.frmMain.LastName.value == "%")
+								addError("Please enter the valid wildcard search. Single wildcard character is not allowed","LastName","")	
+
+						if (document.frmMain.BirthDate.value != "")	{
+						blnReturn = validateDate("Birth Date", document.frmMain.BirthDate.value);
+						}
+						if (document.frmMain.CreatedFrom.value != "") {
+							blnReturn = validateDate("Created Date From", document.frmMain.CreatedFrom.value);
+						}
+						if (document.frmMain.CreatedTo.value != "") {
+							blnReturn = validateDate("Created Date To", document.frmMain.CreatedTo.value);
+						}					
+					
+					}
+				}
+		    }
+		  
+		} else if (strSearchType == "group")	{
+			blnReturn = validateSelectionRequired(document.frmMain.GroupID, "Select a Group")
+		} else if (strSearchType == "action")	{
+			blnReturn = validateSelectionRequired(document.frmMain.ActionID, "Select a Action")
+		} else if (strSearchType == "creationDate")	{
+			blnReturn = validateSelectionRequired(document.frmMain.Days, "Select a Creation Date")
+		} else if (strSearchType == "submissionDate"){
+			blnReturn = validateSelectionRequired(document.frmMain.SubmitDays, "Submission Date")
+		}
+		
+		// Check record type Radio buttons
+		if ("Admissions" != "Inquiry")
+		{
+		    
+			if ((!validateRadioButtonRequired(document.frmMain.RecordType, "Record Options")) && blnReturn)	{
+				blnReturn = false;
+			}
+			
+		}
+		return blnReturn;		// return results
+	}
+
+function addProperty(objName, propData)	{
+	for (var i=0;i<propData.length;++i) {
+		objName[propData[i][0]] = propData[i][1]
+	}
+} 
+
+function setQueryDesc()	{
+	var selValue = document.frmMain.QueryID.options[document.frmMain.QueryID.selectedIndex].value;	
+	
+	if (selValue == "") {
+		document.frmMain.QueryDesc.value = "";
+	} else {
+		document.frmMain.QueryDesc.value = (queryDesc[selValue]==undefined ? "" : queryDesc[selValue]);
+	}	
+	
+	selectSearchType('query');
+
+	document.frmMain.SysQuery.selectedIndex = 0
+	
+}
+
+function setGroupDesc()	{
+	var selValue = document.frmMain.GroupID.options[document.frmMain.GroupID.selectedIndex].value;	
+	
+	if (selValue == "")	{
+		document.frmMain.GroupDesc.value = "";
+	} else {
+		document.frmMain.GroupDesc.value = (groupDesc[selValue]==undefined ? "" : groupDesc[selValue]);
+	}
+	
+	selectSearchType('group');
+}
+
+function setActionDesc()	{
+	var selValue = document.frmMain.ActionID.options[document.frmMain.ActionID.selectedIndex].value;	
+
+	if (selValue == "")	{
+		document.frmMain.ActionDesc.value = "";
+	} else {
+		document.frmMain.ActionDesc.value = actionDesc[selValue];
+	}
+
+	selectSearchType('action');	
+}
+function selectSearchType(name)	{
+	var types = document.frmMain.SearchTypes
+
+	for (var i = 0; i < types.length; ++i)	{		
+		if (types[i].value == name)	{
+			types[i].checked = true;
+			break;
+		}
+	}
+}
+
+
+</SCRIPT>
+	<script language="JavaScript">
+	// to create pop-up window
+	
+function windowOpen(window_url) {
+   helpWin = 
+window.open(window_url,'','toolbar=no,status=no,scrollbars=yes,menubar=no,resizable=yes,directories=no,location=no,width=550,height=450');
+   if (document.images) { 
+       if (helpWin) helpWin.focus()
+   }
+}
+//-->
+</script>
+<SCRIPT LANGUAGE="JavaScript">addProperty(queryDesc,[["242","aaa"],["251","Query for Email Test"],["245","EMTPRS-21521"],["243","EULA"],["246","EULA EQUAL TO NO"],["244","query1"],["252","This query is for Email validation"],["247","rec"],["248","SafariR28"],["237","Test Query"],["249","Testing for Between values"],["238","Subject Maths"]]);
+addProperty(groupDesc,[["39","Test Group"],["29","Test Group"],["30","Tets Group"],["24","add to App Create Grp on create new application"],["25","By default all students are added to common group on submit"],["26","If the subject selected is Maths. Attach all the students to this group"],["27","All the student s who select subject as science are in this group"],["31","Test Group"],["33","Automation Test Group"],["38","Test Group"],["35","Test Group"],["52","Shivan"],["34","Test Group"],["28","Test Group"],["32","Automation Test Group"],["36","Test Group"],["37","Test Group"]]);
+addProperty(actionDesc,[["20530","9/12/2014: Send Email: GRE Test"],["20529","9/12/2014: Send Email: Application creation"],["20528","9/12/2014: Invite to Event: Event Invitation Email"],["20527","9/11/2014: Send Email: Applcation creation followup"],["20526","9/11/2014: Send Email: Applcation creation followup"],["20525","9/11/2014: Send Email: Applcation creation followup"],["20524","9/10/2014: Invite to Event: Event Invitation Email"],["20523","9/10/2014: Send Email: Applcation creation followup"],["20522","9/10/2014: Send Email: Applcation creation followup"],["20521","9/9/2014: Send Email: Application creation"],["20520","9/9/2014: Send Email: Application creation"],["20519","9/9/2014: Invite to Event: Event Invitation Email"],["20518","9/9/2014: Send Email: Application creation"],["20517","9/9/2014: Send Email: GRE Test"],["20516","9/9/2014: Send Email: Application creation"],["20515","9/9/2014: Send Email: Applcation creation followup"],["20514","9/9/2014: Send Email: Applcation creation followup"],["20513","9/9/2014: Send Email: Applcation creation followup"],["20512","9/9/2014: Send Email: Applcation creation followup"],["20511","9/9/2014: Send Email: Applcation creation followup"],["20510","9/8/2014: Send Email: General Interview confirm"],["20509","9/8/2014: Send Email: Applicant interview confirm"],["20508","9/8/2014: Send Email: GRE Test Followup"],["20507","9/8/2014: Send Email: GRE Test Followup"],["20506","9/7/2014: Send Email: General Interview confirm"],["20505","9/7/2014: Send Email: Applicant interview confirm"],["20504","9/6/2014: Send Email: Applcation creation followup"],["20503","9/6/2014: Send Email: Applcation creation followup"],["20502","9/5/2014: Send Email: General Interview confirm"],["20501","9/5/2014: Send Email: Applicant interview confirm"],["20500","9/5/2014: Send Email: GRE Test Followup"],["20499","9/5/2014: Send Email: Application creation"],["20498","9/5/2014: Send Email: General Interview confirm"],["20497","9/5/2014: Send Email: Applicant interview confirm"],["20496","9/5/2014: Send Email: Applcation creation followup"],["20495","9/5/2014: Send Email: Applcation creation followup"],["20494","9/5/2014: Send Email: GRE Test Followup"],["20493","9/5/2014: Send Email: Applcation creation followup"],["20492","9/5/2014: Send Email: Applcation creation followup"],["20491","9/5/2014: Send Email: GRE Test"],["20490","9/5/2014: Send Email: Application creation"],["20489","9/5/2014: Send Email: GRE Test"],["20488","9/5/2014: Send Email: Application creation"],["20486","9/4/2014: Send Email: General Interview confirm"],["20485","9/4/2014: Send Email: Applicant interview confirm"],["20484","9/4/2014: Send Email: Application creation"],["20483","9/4/2014: Send Email: Applcation creation followup"],["20482","9/4/2014: Send Email: Applcation creation followup"],["20481","9/3/2014: Send Email: Applcation creation followup"],["20480","9/3/2014: Send Email: Applcation creation followup"],["20478","9/2/2014: Send Email: Application creation"],["20477","9/2/2014: Send Email: Application creation"],["20476","9/2/2014: Send Email: Application creation"],["20475","9/2/2014: Send Email: Application creation"],["20474","9/2/2014: Send Email: Application creation"],["20473","9/2/2014: Send Email: GRE Test"],["20472","9/2/2014: Send Email: Application creation"],["20471","9/2/2014: Send Email: GRE Test"],["20470","9/2/2014: Send Email: Application creation"],["20468","8/31/2014: Send Email: General Interview confirm"],["20467","8/31/2014: Send Email: Applicant interview confirm"],["20466","8/31/2014: Send Email: General Interview confirm"],["20465","8/31/2014: Send Email: Applicant interview confirm"],["20464","8/31/2014: Send Email: GRE Test Followup"],["20463","8/31/2014: Send Email: GRE Test Followup"],["20462","8/30/2014: Send Email: GRE Test Followup"],["20461","8/30/2014: Send Email: General Interview confirm"],["20460","8/30/2014: Send Email: Applicant interview confirm"],["20459","8/29/2014: Send Email: General Interview confirm"],["20458","8/29/2014: Send Email: Applicant interview confirm"],["20457","8/29/2014: Send Email: General Interview confirm"],["20456","8/29/2014: Send Email: Applicant interview confirm"],["20446","8/28/2014: Invite to Event: Event Invitation Email"],["20445","8/28/2014: Send Email: General Interview confirm"],["20444","8/28/2014: Send Email: Applicant interview confirm"],["20443","8/28/2014: Send Email: General Interview confirm"],["20442","8/28/2014: Send Email: Applicant interview confirm"],["20441","8/28/2014: Send Email: General Interview confirm"],["20440","8/28/2014: Send Email: Applicant interview confirm"],["20439","8/28/2014: Send Email: GRE Test"],["20438","8/28/2014: Send Email: Application creation"],["20437","8/28/2014: Send Email: General Interview confirm"],["20436","8/28/2014: Send Email: Applicant interview confirm"],["20435","8/28/2014: Send Email: GRE Test"],["20434","8/28/2014: Send Email: General Interview confirm"],["20433","8/28/2014: Send Email: Applicant interview confirm"],["20432","8/28/2014: Send Email: Application creation"],["20431","8/27/2014: Send Email: Application creation"],["20430","8/27/2014: Send Email: GRE Test"],["20429","8/27/2014: Send Email: Application creation"],["20428","8/27/2014: Send Email: Application creation"],["20427","8/27/2014: Send Email: Application creation"],["20426","8/26/2014: Send Email: Send email on Submit application"],["20425","8/26/2014: Send Email: Send email on Submit application"],["20424","8/26/2014: Send Email: Send email on Submit application"],["20423","8/26/2014: Send Email: Send email on Submit application"],["20422","8/26/2014: Send Email: Send email on Submit application"],["20421","8/26/2014: Send Email: Applcation creation followup"],["20420","8/26/2014: Send Email: Applcation creation followup"],["20419","8/26/2014: Send Email: Application creation"]]);
+</SCRIPT>
+
+<link rel="stylesheet" href="../Common/stylesheet.css">
+<style>
+	#calendar {position:absolute; top:50px; left:50px; visibility:hidden; background-color:white;}
+	TD.cal { font-family:arial; font-size: 8pt; }
+	TD.calmonth { font-family:arial; font-size: 8pt; text-align: right;}
+	TD.caltoday { font-family:arial; font-size: 8pt; text-align: right; color: white; background-color:#C0C0C0; border-width:1; border-type:solid; border-color:#800000; }
+	INPUT.caltoday { font-family:arial; font-size: 8pt; width:47px; height: 20px; }
+	A.cal { text-decoration:none; color:#000000; }
+	A.calthismonth { text-decoration:none; color:#000000; }
+	A.calothermonth { text-decoration:none; color:#808080; }
+</style>
+<script language="JavaScript" SRC="../common/calendarpopup.js"></script>
+<script language="javascript" src="../common/common.js"></script>
+<script language="javascript">
+function loader(){
+loadImages();
+}
+</script>
+</head>
+<body bgcolor="#FFFFFF" onLoad="javascript:loader();" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<script language="javascript">
+
+function loadImages()
+{
+//MM_preloadImages('../images/left_menu/main_choice_o.gif','../images/left_menu/sub_choice_o.gif','../images/top_nav/main_o.gif','../images/top_nav/top_right2_o.gif','../images/common_images/contact_hd_o.gif','../images/common_images/press_releases_o.gif','../images/common_images/spotlights_o.gif','../images/common_images/faq_o.gif')
+}
+
+</script>
+<!--- Session Timeout --->
+<!--- default header.asp --->
+
+<SCRIPT LANGUAGE="JAVASCRIPT">
+var	onesecond = 1000;
+var	oneminute = 60 * onesecond;
+var	fiveminutes = 5 * oneminute;
+var sessiontimeout = "120" * oneminute;
+/*
+function warningTimer()
+{
+	timeinterval = sessiontimeout - fiveminutes; // (60 - 5)
+	timer=setTimeout("alert('Your session will expire in 5 minutes!')", timeinterval);
+}
+*/
+function warningTimer()
+{
+	var popWindow;
+	var w = 500, h = 340;
+	if (document.all) 
+	{
+	   /* the following is only available after onLoad */
+	   w = document.body.clientWidth;
+	   h = document.body.clientHeight;
+	}
+	else if (document.layers) {
+	   w = window.width;
+	   h = window.height;
+	}
+	var popW, popH, lefPos, topPos;
+
+	if (document.all)
+	{
+		popW = 320; //fix width for IE
+		popH = 120; //fix height for IE
+    	leftPos = (w-popW)/2;
+		topPos = (h-popH)/2;
+		propertySet = " scrollbars=no, resizable=no, status=no, menubar=no, toolbar=no, width=370, height=120, top="+ topPos + ",left=" + leftPos + " ";
+	}
+	else
+	{
+		popW = 320; // fix width for NS
+		popH = 100;  //fix height for NS
+    	leftPos = (w-popW)/2;
+		topPos = (h-popH)/2;
+		propertySet = "toolbar=no,menubar=no,locationbar=no,scrollbars=no,resizable=no,status=no,screenX=" + leftPos + ",screenY=" + topPos + ",width=370,height=100";
+	}
+	
+	timeinterval = sessiontimeout - fiveminutes; // (20 - 5)
+	popWindow = "window.open('../common/SessionExpireMsg.asp', 'Error', '" + propertySet + "' )";
+	timer = setTimeout(popWindow, timeinterval);
+}
+
+function sessionTimer()
+{
+	var fivesecond = 5 * onesecond;
+	var sessiontimeout_5 = sessiontimeout - fivesecond; // before 5 seconds to redirect logout  page
+	timer=setTimeout("window.location.href='javascript:sessionExpireLogout();'", sessiontimeout_5);
+}
+
+function techSupportWindow ()
+{
+	var Now = new Date();
+	
+	if (document.all)
+		gNewWin = window.open("http://qawebcenter.applyyourself.com/AYContactHelpDesk/TechSupport.asp?AYID=AFBB3EB-21B7-4A8E-87CA-D6E6A76E07D&d=" + escape(Now.getTime()), "TechSupport", "scrollbars=yes, resizable=yes, status=yes, menubar=no, toolbar=no, width=1000, height=740,left=50,top=30");
+	else
+		gNewWin = window.open("http://qawebcenter.applyyourself.com/AYContactHelpDesk/TechSupport.asp?AYID=AFBB3EB-21B7-4A8E-87CA-D6E6A76E07D&d=" + escape(Now.getTime()), "TechSupport", "toolbar=no,menubar=no,locationbar=no,scrollbars=yes,resizable=yes,status=yes,screenX=50,screenY=30,width=1000,height=740");
+}
+	
+function windowPopOpen(theURL,winName,features) 
+{ 
+    window.open(theURL,winName,features);
+}
+
+function updateProfile()
+{
+    window.location.href = '../AYMaintainUsers/UserProfileUpdate.asp';
+}
+
+
+</SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT">warningTimer();</SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT">sessionTimer();</SCRIPT>
+
+<table width="750" border="0" cellspacing="0" cellpadding="0" height="100%">
+
+ <!-- begin masthead -->
+  <tr align="right" valign="top">
+    <td rowspan="2" class="logoCell"><img src="../images/common_images/logo.png" height="51" width="157"></td>
+    <td class="formtext userInfo" >
+        
+            Welcome For (ayauto) | 
+            
+	        <a href="javascript:techSupportWindow();">online support</a> |
+	    
+    	 <a href="javascript:logout();">logout</a>
+	</td>
+  </tr>
+  <tr>
+  	<td class="gotoCell">
+  		
+    </td>
+  </tr>
+  
+  <tr> 
+    <td colspan="2" class="mastBar">&nbsp;</td>
+  </tr>
+  <!-- end masthead -->
+    <tr> 
+   <td id="menuCol" height="100%" align="right" valign="top">
+    
+        <div class="small-text center">Application for QA Automation</div>
+    
+<style type="text/css"> 
+  /* DEFAULT STYLES ---- NEEEDED START */
+  .clCMEvent{position:absolute; width:99%; height:99%; clip:rect(0,100%,100%,0); left:0; top:0; visibility:visible}
+  .clCMAbs{position:absolute; visibility:hidden; left:0; top:0}
+  /* DEFAULT STYLES ---- NEEEDED END */
+  .clT, .clTover, .clTSub, .clToverSub, .clTSub2, .clToverSub2 {position:absolute; font-family:arial,helvetica; cursor:pointer; font-size: 12px; text-align: left; }
+  .clT, .clTover{ padding:0; }
+  .clT .clT, .clT .clTover {padding: 5px 0 5px 5px; line-height: 17px;}
+  .clTSub, .clToverSub, .clTSub2, .clToverSub2 { padding:0; text-indent: 5px; line-height: 25px; }
+  .clT, .clTSub, .clTSub2 { color:#000; background-color:#E5E4D9; }
+  .clTover, .clToverSub, .clToverSub2 {color:#fff; background-color:#17469E;}
+  .clTSub, .clTSub2 {border:1px solid #B1B1B1;}
+</style>
+
+<script language="JavaScript" src="../Common/coolmenus4.js">
+/*****************************************************************************
+Copyright (c) 2001 Thomas Brattli (webmaster@dhtmlcentral.com)
+
+DHTML coolMenus - Get it at coolmenus.dhtmlcentral.com
+Version 4.0_beta
+This script can be used freely as long as all copyright messages are
+intact.
+
+Extra info - Coolmenus reference/help - Extra links to help files **** 
+CSS help: http://192.168.1.31/projects/coolmenus/reference.asp?m=37
+General: http://coolmenus.dhtmlcentral.com/reference.asp?m=35
+Menu properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=47
+Level properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=48
+Background bar properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=49
+Item properties: http://coolmenus.dhtmlcentral.com/properties.asp?m=50
+******************************************************************************/
+</script>
+
+<script language="JavaScript">
+	function newwindow(url)
+	{
+	
+	 window.open(url ,"", "toolbar=no,menubar=no,locationbar=no,scrollbars=no,resizable=no,status=no,width=700, height=400,left=100");
+	}
+	
+	/********************************************************************************
+	Construct your menus below
+	********************************************************************************/
+	
+	//Main items:
+	oMenu.makeMenu('','','<span class="menu_heading">Main Menu</span>','../AYClientAdmin/ClientMain.asp?d=9%2F12%2F2014+3%3A18%3A37+AM')
+oMenu.makeMenu('','','<span class="menu_heading">Application</span>','../AYClientAdmin/packageMain.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAddApp',0,'Add an Applicant')
+oMenu.makeMenu('','mnuAddApp','Add a Manual Application','../AYSecurity/CreateAppAccAdmin.asp?nav=NIq2AU5AMYE%3D','_blank')
+oMenu.makeMenu('','mnuAddApp','Add a QuickAdd Application','../AYApplicantMain/AYQuickAddForms.asp?PageSource=yes&d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D','_blank')
+oMenu.makeMenu('','','Search for Applicants','../AYSearchForStudent/search_for_student_record.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','','Identify Duplicates','../AYDuplicates/SelectAppDupCriteria.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdmin','','Application Administration')
+oMenu.makeMenu('','mnuAppAdmin','Configure Forms','../AYDataCatalogTree/Main.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Style Sheet','../AYManageHTML/Style.asp?mode=p&d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Dynamic Text','../AYDynamicText/DynamicText.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Download Forms','../AYDownloadForms/DownloadForms.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdminCodeLookup','mnuAppAdmin','Manage Code Lookup')
+oMenu.makeMenu('','mnuAppAdminCodeLookup','Add/Edit Lookup Values','../AYManageCodeLookUp/ListCodeLookUp.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminCodeLookup','Configure Code Lookup','../AYCodeLookup/code_lookup_configure.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure AVS','../AYCodeLookup/AVS_configure.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Upload Images','../AYUploadImages/UploadImages.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Business Rules','../AYConfigBusRules/BRDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdmin','Configure Decision Letters','../AYDecision/DecisionTemplatesList.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuWCConfig','','WebCenter Administration')
+oMenu.makeMenu('','mnuWCConfig','Configure Prospect Match','../AYMatchProspects/AYMatchProspects.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Configure Duplicates','../AYDuplicates/Configure_Duplicates.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Folders','../AYManageGroups/ManageGroups.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Groups','../AYManageAppGroups/ManageAppGroups.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Package','../AYClientAdmin/EditView_Package.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage Queries','../AYManageQueries/manage_queries.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuWCConfig','Manage RA Accounts','../AYACLAdmin/ACLList_webcenter.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAdminTemplates','mnuWCConfig','Manage Templates')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Email Templates','../AYMANEMAILTEMPS/METDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Export Templates','../AYConfigExports/configure_exports.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAdminTemplates','Manage Import Templates','../AYConfigImports/configure_imports_webcenter.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuImports','','Imports')
+oMenu.makeMenu('','mnuImports','Run Import','../AYRunImport/Import_Admin.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuImports','Monitor Import Status','../AYRunImport/Import_Monitor.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuManComm','','Manage Communications')
+oMenu.makeMenu('','mnuManComm','Configure Tracks','../AYManageTracks/Manage_Tracks.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Manage Email Metrics','../AYManageCampaigns/CampaignsList.asp?d=9%2F12%2F2014+3%3A18%3A37+AM&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Manage Email Templates','../AYMANEMAILTEMPS/METDispAll.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuManComm','Monitor Scheduled Email','../AYMonitorMassEmail/MassEmailSearch.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('mnuAppAnalysis','','Applicant Analysis')
+oMenu.makeMenu('','mnuAppAnalysis','Ad Hoc Analysis','../AYActReportTemplate/Act_Report_Template_addedit.asp?AdHoc=1&nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAnalysis','Data Analysis Templates','../AYActReportTemplate/Manage_Act_Report_Template.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu('','mnuAppAnalysis','Online Payment Reports','../AYReports/System_Reports.asp?nav=NIq2AU5AMYE%3D')
+oMenu.makeMenu(0,0,0,'../ayclientadmin/packageMain.asp?d=9%2F12%2F2014+3%3A18%3A37+AM',0,150,25,'../images/common_images/clearspacer.gif');
+oMenu.makeMenu('mnuSelMod','','Change Systems');oMenu.makeMenu('mnuInquiry','mnuSelMod','Prospect System')
+oMenu.makeMenu('mnuAdm','mnuSelMod','Application System')
+oMenu.makeMenu('mnuEvent','mnuSelMod','Event System')
+oMenu.makeMenu('','mnuInquiry','Prospect Package','../AYClientAdmin/moduleMain.asp?ModuleName=Inquiry&ModuleID=164&PackageID=447&PackageName=Prospect Package&PackageTypeName=Inquiry Package')
+oMenu.makeMenu('','mnuAdm','Application for QA Automation','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=419&PackageName=Application for QA Automation&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Recommendation','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=420&PackageName=Recommendation&PackageTypeName=Recommendation')
+oMenu.makeMenu('','mnuAdm','Enrollment','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=427&PackageName=Enrollment&PackageTypeName=Enrollment')
+oMenu.makeMenu('','mnuAdm','Application2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=451&PackageName=Application2&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Recommendation2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=452&PackageName=Recommendation2&PackageTypeName=Recommendation')
+oMenu.makeMenu('','mnuAdm','Test','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=497&PackageName=Test&PackageTypeName=Admissions Application')
+oMenu.makeMenu('','mnuAdm','Enrollment2','../AYClientAdmin/moduleMain.asp?ModuleName=Admissions&ModuleID=157&PackageID=503&PackageName=Enrollment2&PackageTypeName=Enrollment')
+oMenu.makeMenu('','mnuEvent','Event Package','../AYClientAdmin/moduleMain.asp?ModuleName=Event&ModuleID=166&PackageID=449&PackageName=Event Package&PackageTypeName=Event')
+	
+	/************************End menu construction****************************************************/
+	//When all the menus are written out we instantiate the menus
+	
+	oMenu.construct()
+</script>
+</td>
+<td align="right" height="100%" valign="top" id="contentCol">
+<div align="left" id="divAyConfirmation" style="display:none;width:580px;" class="AYConfirmationText"></div>
+
+<form name="frmMain" method="post" action="search_for_student_record_results.asp?SearchDetails=True" onSubmit="return submitForm()">	<input type="hidden" name="IsQuery">
+	<input type="hidden" name="QueryName" value="">
+  <table width="580" border="0" cellspacing="0" cellpadding="0">
+    <tr align="left" class="FormText"> 
+      <td valign="middle" colspan="6"><DIV ID="AYInstructions" style="display:none" class="FormText">Select the criteria below for creating a list of prospective students.  When the search results are obtained, you will be able to perform actions (e.g., email, export, print label, etc.) on your search results. 
+	  When using the query option to search for records, please note that the query definition determines whether the query will return submitted or not submitted applicants.  Thus, the radio buttons at the top of the page to search on "Submitted" or "Not Submitted" do not apply to searches using a query.<br><img src="../images/common_images/dividing_line.gif" width="579" height="5"><br><br></DIV>
+<font style="font-size: 8pt; font-family: Arial,Sans-Serif;">
+Application Module :: Search for 
+Applicants
+	</font></td>
+    </tr>
+	
+    <tr align="left" class="FormText">
+      <td valign="middle" colspan="5" bgcolor="#CCCCCC">&nbsp;<img src="../Images/common_images/question_button.gif" width="11" height="12" align="absmiddle" border="0">
+      <A HREF="javascript:show('AYInstructions')"><font class="FormText" color="#000000">show</font></A>
+      | <A HREF="javascript:hide('AYInstructions')"><font class="FormText" color="#000000">hide</font></A>
+      <font class="FormText" color="#000000">instructions</font></td>
+      <td valign="middle" align="right" bgcolor="#CCCCCC">
+        <input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/dividing_line.gif" width="579" height="5"></td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr> 
+      <td bgcolor="#CCCCCC">&nbsp;</td>
+      <td align="left" valign="middle" colspan="2" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Display 
+        Options</font></td>
+      <td align="left" valign="middle" colspan="3" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading"> 
+        Record Options
+        </font></td>
+    </tr>
+    <tr> 
+      <td align="left" valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr>
+
+    <td>&nbsp;</td>
+    <td align="left" valign="top"><font face="Arial, Helvetica, sans-serif"  class="FormText">Number
+        of Records to Display:</font></td>
+      <td align="left" valign="top" class="FormFields">
+        <select name="PageSize" class="FormFields">
+          <option value=25 >25</option>
+          <option value=50 Selected>50</option>
+          <option value=75 >75</option>
+          <option value=100 >100</option>
+          <option value=250 >250</option>
+        </select>
+      </td>
+      <td align="left" valign="middle" colspan="3" class="FormText">
+
+		<input type="radio" name="RecordType" value="yes" class="FormFields" checked>
+        Submitted&nbsp;&nbsp;&nbsp;&nbsp;
+   	    <input type="radio" name="RecordType" value="no" class="FormFields" >
+        Not Submitted 
+		<input type="radio" name="RecordType" value="both" class="FormFields" >
+        Both <br>
+
+      </td>
+    </tr>
+     <tr>
+     <td>&nbsp;</td>
+    <td align="left" valign="top"><font face="Arial, Helvetica, sans-serif"  class="FormText">Do you want to 
+    view the records with details</font></td>
+		 <td align="left" valign="middle" ><input type="checkbox" name="chkAgree" ID="Checkbox1"></td>
+		</tr>
+	<tr> 
+		<td align="left" valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+	</tr>
+       
+    <tr class="FormHeading"> 
+      <td align="center" valign="middle" bgcolor="#CCCCCC">&nbsp; </td>
+      <td align="left" valign="middle" class="FormHeading" colspan="4" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Search by Date</font> 
+      <td align="right" valign="middle" bgcolor="#CCCCCC"><input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr> 
+      
+      <td align="center" valign="middle">&nbsp;</td>
+      <td align="left" valign="middle" class="FormText"> 
+        <input type="radio" name="SearchTypes" value="creationDate" class="FormFields" >
+        Creation Date</td>
+      <td align="left" valign="top" class="FormFields" colspan="4">
+      <select name="Days" class="FormFields" onChange="selectSearchType('creationDate');">
+          <option Selected value = ""> 
+          -- Select --
+          </option>
+          <option value = "1" >1 Day</option>
+          <option value = "2" >2 Day</option>
+          <option value = "3" >3 Day</option>
+          <option value = "4" >4 Day</option>
+          <option value = "5" >5 Day</option>
+          <option value = "6" >6 Day</option>
+          <option value = "7" >7 Day</option>
+          <option value = "30" >30 Day</option>
+          <option value = "ThisWeek" >This Week</option>
+          <option value = "LastWeek" >Last Week</option>
+          <option value = "ThisMonth" >This Month</option>
+          <option value = "LastMonth" >Last Month</option>
+          <option value = "-2147483640" >All</option>
+        </select>
+      </td>
+    </tr>
+   
+   
+    <tr> 
+      <td align="center" valign="middle">&nbsp;</td>
+      <td align="left" valign="middle" class="FormText"> 
+        <input type="radio" name="SearchTypes" value="submissionDate" class="FormFields" Checked>
+        Submission Date</td>
+      <td align="left" valign="top" class="FormFields" colspan="4"> 
+        <select name="SubmitDays" class="FormFields" onChange="selectSearchType('submissionDate');">
+          <option Selected value = ""> 
+          -- Select --
+          </option>
+          <option value = "1" >1 Day</option>
+          <option value = "2" >2 Day</option>
+          <option value = "3" >3 Day</option>
+          <option value = "4" >4 Day</option>
+          <option value = "5" >5 Day</option>
+          <option value = "6" >6 Day</option>
+          <option value = "7" >7 Day</option>
+          <option value = "30" >30 Day</option>
+          <option value = "ThisWeek" >This Week</option>
+          <option value = "LastWeek" >Last Week</option>
+          <option value = "ThisMonth" >This Month</option>
+          <option value = "LastMonth" >Last Month</option>
+          <option value = "-2147483640" >All</option>
+        </select>
+      </td>
+    </tr>
+	
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr class="FormHeading"> 
+      <td align="center" valign="middle" bgcolor="#CCCCCC"> 
+        <input type="radio" name="SearchTypes" value="individual" class="FormFields" 
+        
+        >
+      </td>
+      <td align="left" valign="middle" class="FormHeading" colspan="4" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Search 
+        by Individual</font></td>
+        <td align="right" valign="middle" bgcolor="#CCCCCC"><input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    
+    <tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">First 
+			    Name:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="FirstName" class="FormFields"  onClick="selectSearchType('individual');" value="">&nbsp;&nbsp;Wildcard searches can be performed. 
+			  </td>
+			</tr>
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">Last 
+			    Name:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="LastName" class="FormFields" onClick="selectSearchType('individual');" value="">&nbsp;&nbsp;<a class="2" href="JavaScript:windowOpen('../common/wildcard_help.asp')">Please click here for assistance</a>.
+			  </td>
+			</tr>
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">Birthdate:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="BirthDate" class="FormFields" onClick="selectSearchType('individual');" value=""><br>mm/dd/yyyy
+			  </td>
+			</tr>
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">Email 
+			    Address:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="Email" class="FormFields" onClick="selectSearchType('individual');" value="" size="50">
+			  </td>
+			</tr>
+			
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">ZIP/Postal Code:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="ZipCode" class="FormFields" onClick="selectSearchType('individual');" value="" maxlength="500">
+			  </td>
+			</tr>
+			
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">PIN:
+			    </font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="Pin" class="FormFields" onClick="selectSearchType('individual');" value="" size="15" >
+			  </td>
+			</tr>
+			<tr> 
+			  <td align="center" valign="middle" width="30">&nbsp;</td>
+			  <td align="left" valign="middle" class="FormText"><font face="Arial, Helvetica, sans-serif" class="FormText">Applicant ID:</font></td>
+			  <td align="left" valign="top" class="FormFields" colspan="4"> 
+			    <input type="text" name="ApplyyourSelfID" class="FormFields" onClick="selectSearchType('individual');" value="" size="15" ID="Text3">
+			  </td>
+			</tr>
+    <tr align="left" class="FormHeading"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+	    
+    <tr class="FormHeading"> 
+      <td align="center" valign="middle" width="30" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif"> 
+        
+        <input type="radio" name="SearchTypes" value="query" class="FormFields" >
+        </font></td>
+      <td align="left" valign="middle" class="FormHeading" colspan="4" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Search 
+        Using Query</font></td>
+        <td align="right" valign="middle" bgcolor="#CCCCCC"><input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    
+    	
+	<tr>
+		<td align="center" valign="middle" width="30">&nbsp;</td>
+				<td align="right" valign="middle" class="FormText">
+					<font face="Arial, Helvetica, sans-serif" class="FormText">System Queries:&nbsp;&nbsp;</font>
+				</td>
+      <td align="left" valign="top" class="FormFields" colspan="4">
+        <select name="SysQuery" class="FormFields" onchange="selectSearchType('query');document.frmMain.QueryID.selectedIndex = 0;document.frmMain.QueryDesc.value='';" ID="Select3">
+          <option selected value="">-- Select --</option>
+          <option value="1" >Not submitted with all required questions completed</option>
+		  <option value="8" >Not submitted with [%] required questions completed</option>
+		  <option value="10" >Paid but Not Submitted</option>
+		  
+		    <option value="11" >Accepted Enrollment  without payment</option>
+		%>
+		
+        </select>
+      &nbsp;&nbsp;&nbsp;</td>
+  	</tr>
+	<tr>
+		<td align="center" valign="middle" class="FormText" colspan="6"><b>OR</b></td>
+  	</tr>
+	
+	<tr>
+		<td align="center" valign="middle" width="30">&nbsp;</td>
+       <td align="right" valign="middle">
+	   <font face="Arial, Helvetica, sans-serif" class="FormText">User Queries:&nbsp;&nbsp;</font></td>
+      <td align="left" valign="top" class="FormFields" colspan="4"> 
+        <select name="QueryID" class="FormFields" onChange="setQueryDesc();document.frmMain.SysQuery.selectedIndex=0">
+          <option selected value="">-- Select --</option>
+          <option  value="242" >&nbsp; &nbsp;aaa</option><option  value="251" >&nbsp; &nbsp;EmailTest</option><option  value="245" >&nbsp; &nbsp;EMTPRS-21521</option><option  value="243" >&nbsp; &nbsp;EULA</option><option  value="246" >&nbsp; &nbsp;EULA EQUAL TO NO</option><option  value="244" >&nbsp; &nbsp;query1</option><option  value="252" >&nbsp; &nbsp;QueryEmail</option><option  value="247" >&nbsp; &nbsp;recommendation</option><option  value="248" >&nbsp; &nbsp;SafariR28</option><option  value="237" >&nbsp; &nbsp;Test Query</option><option  value="249" >&nbsp; &nbsp;TestforBetween</option><option  value="Group">QFLDR1</option><option  value="238" >&nbsp; &nbsp;Subject Maths</option>
+        </select>
+      </td>
+    </tr>
+	
+    <tr align="left"> 
+      <td valign="middle" colspan="2">&nbsp;</td>
+      <td valign="middle" colspan="4"> 
+        <textarea name="QueryDesc" wrap="VIRTUAL" cols="40" rows="5" class="FormFields" disabled></textarea>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr class="FormHeading"> 
+      <td align="center" valign="middle" width="30" bgcolor="#CCCCCC"> 
+        <input type="radio" name="SearchTypes" value="group" >
+      </td>
+      <td align="left" valign="middle" colspan="4" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Search 
+        by Group</font></td>
+        <td align="right" valign="middle" bgcolor="#CCCCCC"><input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr> 
+      <td align="center" valign="middle" width="30">&nbsp;</td>
+      <td align="left" valign="top">&nbsp;</td>
+      <td align="left" valign="top" class="FormFields" colspan="4"> 
+        <select name="GroupID" class="FormFields" onChange="setGroupDesc();">
+          <option Selected value = ""> 
+          -- Select --
+          </option>
+          		<option  value="39" >&nbsp;&nbsp; Applicant Group</option>		<option  value="29" >&nbsp;&nbsp; Automation Group1</option>		<option  value="30" >&nbsp;&nbsp; Automation Test Two Group</option>		<option  value="24" >&nbsp;&nbsp; BR-App Create Grp</option>		<option  value="25" >&nbsp;&nbsp; BR-Common Grp</option>		<option  value="26" >&nbsp;&nbsp; BR-Maths Grp</option>		<option  value="27" >&nbsp;&nbsp; BR-Science Grp</option>		<option  value="31" >&nbsp;&nbsp; Group Name Already Exists</option>		<option  value="33" >&nbsp;&nbsp; Maximum Character Limit Test</option>		<option  value="38" >&nbsp;&nbsp; No Data Group 2 Delete</option>		<option  value="35" >&nbsp;&nbsp; RootGroup2Move2Folder</option>		<option  value="52" >&nbsp;&nbsp; Shivan</option><option  value="Group">Group Folder 2 Delete</option>		<option  value="34" >&nbsp;&nbsp; Group2Delete</option><option  value="Group">Add/Remove Group Folder</option>		<option  value="28" >&nbsp;&nbsp; Remove Applicant Group</option><option  value="Group">Spl Char Group Folder</option>		<option  value="32" >&nbsp;&nbsp; Spl Char Edit Group</option><option  value="Group">Root2Folder</option>		<option  value="36" >&nbsp;&nbsp; Group2Move2Root</option><option  value="Group">Cincinnati Group Folder</option>		<option  value="37" >&nbsp;&nbsp; Group Cincinnati 2 Fairfax</option>
+        </select>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="2">&nbsp;</td>
+      <td valign="middle" colspan="4"> 
+        <textarea name="GroupDesc" wrap="VIRTUAL" cols="40" rows="5" class="FormFields" disabled></textarea>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr class="FormHeading"> 
+      <td align="center" valign="middle" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif"> 
+        <input type="radio" name="SearchTypes" value="action" >
+        </font></td>
+      <td align="left" valign="middle" colspan="4" bgcolor="#CCCCCC"><font face="Arial, Helvetica, sans-serif" class="FormHeading">Search 
+        by Action</font></td>
+        <td align="right" valign="middle" bgcolor="#CCCCCC"><input type="image" border="0" name="imageField" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr> 
+      <td align="left" valign="middle" colspan="2"><font class="FormText">Only the last 100 action histories will be displayed.</font></td>
+      <td align="left" valign="top" class="FormFields" colspan="4"> 
+        <select name="ActionID" class="FormFields" onChange="setActionDesc();" style="width:330px">
+          <option Selected value = ""> 
+          -- Select --
+          </option>
+          		<option  value="20530" >9/12/2014 3:08:00 AM: Send Email GRE Test</option>		<option  value="20529" >9/12/2014 3:02:08 AM: Send Email Application creation</option>		<option  value="20528" >9/12/2014 2:24:14 AM: Invite to Event Event Invitation Email</option>		<option  value="20527" >9/11/2014 8:02:02 AM: Send Email Applcation creation followup</option>		<option  value="20526" >9/11/2014 5:14:00 AM: Send Email Applcation creation followup</option>		<option  value="20525" >9/11/2014 4:28:02 AM: Send Email Applcation creation followup</option>		<option  value="20524" >9/10/2014 7:11:28 AM: Invite to Event Event Invitation Email</option>		<option  value="20523" >9/10/2014 4:53:02 AM: Send Email Applcation creation followup</option>		<option  value="20522" >9/10/2014 12:50:02 AM: Send Email Applcation creation followup</option>		<option  value="20521" >9/9/2014 11:19:02 AM: Send Email Application creation</option>		<option  value="20520" >9/9/2014 11:13:01 AM: Send Email Application creation</option>		<option  value="20519" >9/9/2014 9:40:16 AM: Invite to Event Event Invitation Email</option>		<option  value="20518" >9/9/2014 9:12:01 AM: Send Email Application creation</option>		<option  value="20517" >9/9/2014 9:06:12 AM: Send Email GRE Test</option>		<option  value="20516" >9/9/2014 9:01:08 AM: Send Email Application creation</option>		<option  value="20515" >9/9/2014 8:35:02 AM: Send Email Applcation creation followup</option>		<option  value="20514" >9/9/2014 5:28:02 AM: Send Email Applcation creation followup</option>		<option  value="20513" >9/9/2014 5:08:00 AM: Send Email Applcation creation followup</option>		<option  value="20512" >9/9/2014 4:22:02 AM: Send Email Applcation creation followup</option>		<option  value="20511" >9/9/2014 3:15:03 AM: Send Email Applcation creation followup</option>		<option  value="20510" >9/8/2014 8:41:03 AM: Send Email General Interview confirm</option>		<option  value="20509" >9/8/2014 8:41:00 AM: Send Email Applicant interview confirm</option>		<option  value="20508" >9/8/2014 4:37:03 AM: Send Email GRE Test Followup</option>		<option  value="20507" >9/8/2014 4:05:02 AM: Send Email GRE Test Followup</option>		<option  value="20506" >9/7/2014 6:50:05 AM: Send Email General Interview confirm</option>		<option  value="20505" >9/7/2014 6:50:02 AM: Send Email Applicant interview confirm</option>		<option  value="20504" >9/6/2014 9:40:02 AM: Send Email Applcation creation followup</option>		<option  value="20503" >9/6/2014 3:21:01 AM: Send Email Applcation creation followup</option>		<option  value="20502" >9/5/2014 8:41:03 AM: Send Email General Interview confirm</option>		<option  value="20501" >9/5/2014 8:41:00 AM: Send Email Applicant interview confirm</option>		<option  value="20500" >9/5/2014 8:38:03 AM: Send Email GRE Test Followup</option>		<option  value="20499" >9/5/2014 8:30:25 AM: Send Email Application creation</option>		<option  value="20498" >9/5/2014 8:01:03 AM: Send Email General Interview confirm</option>		<option  value="20497" >9/5/2014 8:01:00 AM: Send Email Applicant interview confirm</option>		<option  value="20496" >9/5/2014 6:36:02 AM: Send Email Applcation creation followup</option>		<option  value="20495" >9/5/2014 6:26:00 AM: Send Email Applcation creation followup</option>		<option  value="20494" >9/5/2014 6:12:03 AM: Send Email GRE Test Followup</option>		<option  value="20493" >9/5/2014 5:43:02 AM: Send Email Applcation creation followup</option>		<option  value="20492" >9/5/2014 5:29:02 AM: Send Email Applcation creation followup</option>		<option  value="20491" >9/5/2014 4:37:14 AM: Send Email GRE Test</option>		<option  value="20490" >9/5/2014 4:32:01 AM: Send Email Application creation</option>		<option  value="20489" >9/5/2014 4:05:01 AM: Send Email GRE Test</option>		<option  value="20488" >9/5/2014 3:49:18 AM: Send Email Application creation</option>		<option  value="20486" >9/4/2014 8:48:03 AM: Send Email General Interview confirm</option>		<option  value="20485" >9/4/2014 8:48:00 AM: Send Email Applicant interview confirm</option>		<option  value="20484" >9/4/2014 6:49:25 AM: Send Email Application creation</option>		<option  value="20483" >9/4/2014 3:12:00 AM: Send Email Applcation creation followup</option>		<option  value="20482" >9/4/2014 2:45:00 AM: Send Email Applcation creation followup</option>		<option  value="20481" >9/3/2014 4:43:01 AM: Send Email Applcation creation followup</option>		<option  value="20480" >9/3/2014 2:04:01 AM: Send Email Applcation creation followup</option>		<option  value="20478" >9/2/2014 10:20:02 AM: Send Email Application creation</option>		<option  value="20477" >9/2/2014 10:18:29 AM: Send Email Application creation</option>		<option  value="20476" >9/2/2014 10:05:26 AM: Send Email Application creation</option>		<option  value="20475" >9/2/2014 9:41:18 AM: Send Email Application creation</option>		<option  value="20474" >9/2/2014 9:17:24 AM: Send Email Application creation</option>		<option  value="20473" >9/2/2014 8:38:01 AM: Send Email GRE Test</option>		<option  value="20472" >9/2/2014 8:28:01 AM: Send Email Application creation</option>		<option  value="20471" >9/2/2014 6:12:16 AM: Send Email GRE Test</option>		<option  value="20470" >9/2/2014 6:03:02 AM: Send Email Application creation</option>		<option  value="20468" >8/31/2014 4:48:03 AM: Send Email General Interview confirm</option>		<option  value="20467" >8/31/2014 4:48:00 AM: Send Email Applicant interview confirm</option>		<option  value="20466" >8/31/2014 4:38:04 AM: Send Email General Interview confirm</option>		<option  value="20465" >8/31/2014 4:38:01 AM: Send Email Applicant interview confirm</option>		<option  value="20464" >8/31/2014 4:37:01 AM: Send Email GRE Test Followup</option>		<option  value="20463" >8/31/2014 4:21:00 AM: Send Email GRE Test Followup</option>		<option  value="20462" >8/30/2014 6:49:01 AM: Send Email GRE Test Followup</option>		<option  value="20461" >8/30/2014 5:37:03 AM: Send Email General Interview confirm</option>		<option  value="20460" >8/30/2014 5:37:00 AM: Send Email Applicant interview confirm</option>		<option  value="20459" >8/29/2014 4:57:03 AM: Send Email General Interview confirm</option>		<option  value="20458" >8/29/2014 4:57:00 AM: Send Email Applicant interview confirm</option>		<option  value="20457" >8/29/2014 4:47:04 AM: Send Email General Interview confirm</option>		<option  value="20456" >8/29/2014 4:47:01 AM: Send Email Applicant interview confirm</option>		<option  value="20446" >8/28/2014 6:20:02 AM: Invite to Event Event Invitation Email</option>		<option  value="20445" >8/28/2014 5:32:04 AM: Send Email General Interview confirm</option>		<option  value="20444" >8/28/2014 5:32:01 AM: Send Email Applicant interview confirm</option>		<option  value="20443" >8/28/2014 5:24:05 AM: Send Email General Interview confirm</option>		<option  value="20442" >8/28/2014 5:24:02 AM: Send Email Applicant interview confirm</option>		<option  value="20441" >8/28/2014 5:18:04 AM: Send Email General Interview confirm</option>		<option  value="20440" >8/28/2014 5:18:01 AM: Send Email Applicant interview confirm</option>		<option  value="20439" >8/28/2014 4:37:25 AM: Send Email GRE Test</option>		<option  value="20438" >8/28/2014 4:29:08 AM: Send Email Application creation</option>		<option  value="20437" >8/28/2014 4:29:05 AM: Send Email General Interview confirm</option>		<option  value="20436" >8/28/2014 4:29:02 AM: Send Email Applicant interview confirm</option>		<option  value="20435" >8/28/2014 4:21:00 AM: Send Email GRE Test</option>		<option  value="20434" >8/28/2014 4:20:03 AM: Send Email General Interview confirm</option>		<option  value="20433" >8/28/2014 4:20:00 AM: Send Email Applicant interview confirm</option>		<option  value="20432" >8/28/2014 4:15:02 AM: Send Email Application creation</option>		<option  value="20431" >8/27/2014 8:02:02 AM: Send Email Application creation</option>		<option  value="20430" >8/27/2014 6:49:28 AM: Send Email GRE Test</option>		<option  value="20429" >8/27/2014 6:39:01 AM: Send Email Application creation</option>		<option  value="20428" >8/27/2014 5:14:00 AM: Send Email Application creation</option>		<option  value="20427" >8/27/2014 4:28:02 AM: Send Email Application creation</option>		<option  value="20426" >8/26/2014 10:27:00 AM: Send Email Send email on Submit applicati</option>		<option  value="20425" >8/26/2014 10:22:23 AM: Send Email Send email on Submit applicati</option>		<option  value="20424" >8/26/2014 7:28:02 AM: Send Email Send email on Submit applicati</option>		<option  value="20423" >8/26/2014 6:53:25 AM: Send Email Send email on Submit applicati</option>		<option  value="20422" >8/26/2014 6:25:00 AM: Send Email Send email on Submit applicati</option>		<option  value="20421" >8/26/2014 6:19:02 AM: Send Email Applcation creation followup</option>		<option  value="20420" >8/26/2014 6:07:02 AM: Send Email Applcation creation followup</option>		<option  value="20419" >8/26/2014 4:53:01 AM: Send Email Application creation</option>
+        </select>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="2">&nbsp;</td>
+      <td valign="middle" colspan="4"> 
+        <textarea name="ActionDesc" wrap="VIRTUAL" cols="40" rows="5" class="FormFields" disabled></textarea>
+      </td>
+    </tr>
+    <tr align="left"> 
+      <td valign="middle" colspan="6"><img src="../images/common_images/spacer.gif" width="350" height="10"></td>
+    </tr>
+    <tr align="center"> 
+      <td valign="top" colspan="6"><img src="../images/common_images/dividing_line.gif" width="579" height="5"></td>
+    </tr>
+    <tr> 
+      <td valign="top" colspan="5" height="9" bgcolor="#CCCCCC"><span class="FormHeading">&nbsp;</span> 
+      </td>
+      <td valign="middle" height="9" bgcolor="#CCCCCC" align="right"> 
+        <input type="image" border="0" name="imageField2" src="../images/common_images/admin_submit_small_n.gif" width="46" height="11" align="absmiddle">&nbsp;</td>
+    </tr>
+    <tr> 
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="30" height="10"></td>
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="215" height="10"></td>
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="50" height="10"></td>
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="30" height="10"></td>
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="198" height="10"></td>
+      <td align="left" valign="top"><img src="../images/common_images/spacer.gif" width="57" height="10"></td>
+    </tr>
+  </table>
+         <INPUT type="hidden" name="PageNumber" value="1">
+         
+</form>
+<div id="calendar" onclick="selectSearchType('individual');"></div>
+<script language="javascript">gErrString = ""</script></td>
+  </tr>
+<tr class="FormTextSmall"> 
+    <td align="left" valign="top" class="footerCell">&nbsp;</td>
+    
+  <td align="center" valign="middle" class="footerCell borderTop borderRight">&nbsp;</td>
+  </tr>  
+<tr> 
+    <td align="left" valign="top" colspan="2" class="footerCell borderRight">
+    <div class="footerLinks">
+    	<a href="javascript:techSupportWindow();">Online Support</a> | <a href="javascript:newwindowProdSuggestion('../AYClientAdmin/ProductSuggestions.asp', 1000);">Product Suggestions </a>
+    </div>
+        
+               All times are in (GMT-05:00) Eastern Time (US & Canada), unless otherwise specified.<br /> &copy; Copyright 1998-2014 Hobsons Inc. All Rights Reserved.
+          
+    </td>
+  </tr>
+
+
+
+ 
+ <script language="JavaScript">
+
+    function newwindowProdSuggestion(url, w) 
+    {
+    var left = (screen.width / 2) - (w / 2);    
+    window.open(url, "", "toolbar=no,menubar=no,locationbar=no,scrollbars=yes,resizable=yes,status=no,width=1000,height=650,left=" + left);
+	}
+
+	</script>
+</body>
+</html>
